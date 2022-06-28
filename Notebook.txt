@@ -46,18 +46,20 @@ Encoding: UTF-8
 
 		------------------------------------------------ Capítulo 5 (REVER) ------------------------------------------------
 	
-		- Seção 5.1 - Bases de Dados
-		    --> Introdução sobre como os experimentos foram divididos, especificações computador, software e pacotes do R
-			--> Convenção utilizada para com os parâmetros do BRKGA
-			--> Aplicação de padronização e redução de dimensionalidade em todas as bases através do EMD
+		- Seção 5.2 - Calibração de Parâmetros
+		    --> Subconjunto de teste   (x7)
+		    --> 5x replicações         (x5)
+		    --> Pop: 200 - 500 - 1000  (x3)
+		    --> Iter: 200 - 500 - 1000 (x3)
+		    --> grid.type: ESG - ASG   (x2) >> 630 exec
+		    
+		    
 		
-		- Seção 5.2.1 - Estudo de Estabilidade
-			--> Tabela Resumo: Variabilidade em termos das Função Objetivo
-			--> Tabela Resumo: Variabilidade em termos do número de grupos
-			--> (Se possível) Tabela Resumo: Variabilidade dos tempos de execução
+		- Seção 5.2 - Estudo de Estabilidade
+			--> Tabela Resumo: Variabilidade em termos das Função Objetivo, Número de Grupos, Tempos de Execução e Algoritmo
 			--> Expressão de complexidade do algoritmo	
 		
-		- Seção 5.2.2 - Estudo e Comparação entre os Parâmetros
+		- Seção 5.3 - Estudo e Comparação entre os Parâmetros
 			--> Tabela Resumo: Número de aplicações do BFESGA x ESGBRKGA (Grade Simétrica, especificamente)
 			--> Comparação: Qualidade das soluções x Utilizar ou Não Teste Estatístico (Etapa de Grade)
 			--> Comparação: Número Médio de Grupos x Utilizar ou Não Teste Estatístico (Etapa de Grade)
