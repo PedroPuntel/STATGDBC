@@ -16,11 +16,8 @@ Encoding: UTF-8
 	-----------
 	. STATGDBC:
 	-----------
-		--> Debugging: Motivo dos resultados com (ICS = NULL) e (grid.method = NULL)
-		--> DGBClust: Utilizar matriz de distãncias original dos dados para cálculo dos índices de avaliação (silhuete e calinski)
+		--> DGBClust: Utilizar matriz de distâncias original dos dados para cálculo dos índices de avaliação (silhuete e calinski)
 		--> DGBClust: Questão dos testes estatísticos de hopkins/clark-evans: Mesclagem quando houver regularidade e/ou aleatoriedade espacial
-		--> ESG/ASG: Verificar questão do BRKGA na comparação da probabilidade de herença (operadores de cruzamento)
-		--> ESG/ASG: Verificar se a restrição de divisão das grades está funcional (principalmente para o ASG)
 		--> DBSCAN: Estudar como utilizá-lo e já calcular também os seus resultados para ir comparando
 	
 	-------------
@@ -34,49 +31,55 @@ Encoding: UTF-8
 		--> Mesclagem das células: Não queremos rejeitar a hipótese-nula de aleatoriedade espacial nos testes de Hopkins/Clark-Evans
 		--> Falar brevemente sobre efeitos de borda (não considerados) e distâncias evento-evento, ponto-evento e vizinho mais próximo
 		--> Descartar: Estacionariedade, Isotropia, PPP Não-Homogêneo, Monte-Carlo
-		
-		- Introdução:
-			(OK) --> Estatística Espacial e suas subáreas/motivações: Dados de Área, Geoestatística e Processos Ponutais
 			
-		- Seção 3.3 - Processos Pontuais Espaciais
-		    --> Mecanismo estocástico gerador dos dados, problemas de interesse, tipos de padrões de pontos
-			--> Conceitos de Estacionariedade, Isotropia
-			--> Definição formal + exemplos
-			--> Principais processos pontuais: Processo de Poisson Homogêneo (regular e Irregular), CSR, Processo de Poisson Não-Homogêneo
-
-		------------------------------------------------ Capítulo 5 (REVER) ------------------------------------------------
+		- (Pendente) Seção 3.3.2 - Processo de Poisson Homogêneo
+		
+		- (Pendente) Seção 3.3.3 - Investigação dos Efeitos de 1° Ordem
+		
+		- (Pendente) Seção 3.3.4 - Investigação dos Efeitos de 2° Ordem
+		
+		------------------------------------------------ Capítulo 5 ------------------------------------------------
+		
+		- (OK) Seção 5.1 - Base de Dados
 	
-		- Seção 5.2 - Calibração de Parâmetros
+		- (Pendente) Seção 5.2 - Calibração de Parâmetros
 		    --> Subconjunto de teste   (x7)
 		    --> 5x replicações         (x5)
 		    --> Pop: 200 - 500 - 1000  (x3)
 		    --> Iter: 200 - 500 - 1000 (x3)
 		    --> grid.type: ESG - ASG   (x2) >> 630 exec
+		    >> Demais parâmetros, manter default
 		    
-		    
+		- (Refazer) Seção 5.2 - Estudo de Estabilidade
+			--> Tabela: Variabilidade em termos das Função Objetivo, Número de Grupos, Tempos de Execução e Algoritmo
 		
-		- Seção 5.2 - Estudo de Estabilidade
-			--> Tabela Resumo: Variabilidade em termos das Função Objetivo, Número de Grupos, Tempos de Execução e Algoritmo
-			--> Expressão de complexidade do algoritmo	
-		
-		- Seção 5.3 - Estudo e Comparação entre os Parâmetros
-			--> Tabela Resumo: Número de aplicações do BFESGA x ESGBRKGA (Grade Simétrica, especificamente)
-			--> Comparação: Qualidade das soluções x Utilizar ou Não Teste Estatístico (Etapa de Grade)
-			--> Comparação: Número Médio de Grupos x Utilizar ou Não Teste Estatístico (Etapa de Grade)
-			--> Comparação: Qualidade das soluções x Testes Estatísticos para Efeitos de 2° Ordem
-			--> Gráfico Empate x Vitórias x Derrotas: ESG (especificando se foi BFESGA ou ESGBRKGA) x ASG
-			--> Com base nos resultados, justificar escolha dos parâmetros para comparação com o DBSCAN (desempate por tempo de processamento)
-			--> Avaliar a performance do EMD, comparando as projeções obtidas com o plot original das bases bidimensionais
+		- (Pendente) Seção 5.3 - Estudo e Comparação entre os Parâmetros
+		    . Seção 5.3.1 - Escalonamento Multidimensional
+			    --> Análise: Performance do EMD x Projeções Bidimensionais
 			
-		- Seção 5.2.3 - Comparação STATGDBC x DBSCAN
-			--> Questão do tratamento aplicado aos objetos do tipo ruído
-			--> Comparação conduzida fornecendo a ambos algoritmos as coordenadas provenientes do EMD
-			--> Comparação: Número de grupos produzidos x Algoritmos
-			--> Gráfico Empate x Vitórias x Derrotas: STATGDBC (especificando se foi BFESGA ou ESGBRKGA) x ASG
+			. Seção 5.3.2 - Composições de Grade
+    			--> Tabela: Resultados do algoritmo para as bases de clusterização e classificação (exceto Subconjunto de Teste)
+    			--> Análise: Qualidade das soluções e Número de Grupos x Composição de Grade (ESG/ASG)
+			
+			. Seção 5.3.3 - Critérios Estatísticos
+    			--> Análise: Qualidade das soluções e Número de Grupos x Utilizar ou Não Teste Quadrats (Etapa de Grade) p/ Subconjunto de Teste
+    			--> Análise: Qualidade das soluções e Número de Grupos x Testes Hopkins/Clark-Evans p/ Subconjunto de Teste
+			    --> Conclusão: Justificar escolha dos parâmetros (inclusive composição de grade) para comparação com o DBSCAN
+			
+		- (Pendente) Seção 5.4 - Comparação STATGDBC x DBSCAN
+		    --> Observação: Para o DBSCAN, utilizar dados originais (sem EMD) + parâmetros default (sem calibração)
+		    --> Tabela: Qualidade das Soluções, Número de Grupos (exceto ruído) e Tempos de Execução (Subconjunto de Classificação)
+		    --> Análise da tabela anterior
+		    --> Análise: Inspeção visual de alguns agrupamentos produzidos
 
 		------------------------------------------------ Capítulo 6 ------------------------------------------------			
 		
 		- Capítulo 6 - Conclusões
-			-->  Considerações finais e Trabalhos futuros: Testes/Medidas estatísticas diferentes,
-			Calibração de Parâmetros, Testes Estatísticos de Qualidade, Paralelização do algoritmo (disponibilidade Github),
-			Comparação com outros métodos, Diferentes critérios de mesclagem, Validação mais robusta.
+		    --> Resumo da monografia
+		    --> Trabalhos futuros:
+		        . Testes/Medidas estatísticas diferentes e/ou Testes Estatísticos de Qualidade
+		        . Calibração de Parâmetros mais extensa (inclusive do DBSCAN)
+		        . Paralelização do algoritmo (disponibilidade Github),
+			    . Comparações com outros métodos
+			    . Diferentes critérios de mesclagem e/ou índices estatísticos
+			    

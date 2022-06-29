@@ -4,7 +4,6 @@
 
 # Notas de Desenvolvimento
 # --> TODO: Investigar motivo do (ICS = NULL) para as instâncias: 200DATA, A1, BROKEN-RING, INDIAN, SONAR (ESG) | INDIAN (ASG)
-# --> TODO: Investigar 'grid.method' = NULL
 
 # Imports
 source("01_Scripts/01_STATGDBC.R")
@@ -18,9 +17,6 @@ require("pdfCluster")
 ####################
 # Rotinas auxiliares
 ####################
-
-# TODO: Índice de Silhueta Médio
-# TODO: Índice de Calinski-Harabasz
 
 # Rotina auxiliar que calcula o Índice de Rand Ajustado
 get_adj_rand_index <- function(statgdbc.obj, k.real) {
@@ -38,9 +34,20 @@ all_cluster_mds_data <- list.files("00_Data/Processed/Clustering/All/", full.nam
 all_classf_mds_data <- list.files("00_Data/Processed/Classification/MDS/", full.names = T) %>% sort() %>% lapply(fread) %>% lapply(as.matrix)
 all_classf_clusters <- list.files("00_Data/Processed/Classification/Clusters/", full.names = T) %>% sort() %>% lapply(fread) %>% lapply(as.matrix)
 
-# Subconjunto de bases de clusterização
-subset_cluster_mds_data <- list.files("00_Data/Processed/Clustering/Subset/", full.names = T) %>% sort() %>% lapply(fread) %>% lapply(as.matrix)
-# lapply(subset_cluster_mds_data, function(i) PlotMDS(i))
+# Subconjunto de teste
+test_subset_data <- list.files("00_Data/Processed/Clustering/Subset/", full.names = T) %>% sort() %>% lapply(fread) %>% lapply(as.matrix)
+# lapply(test_subset_data, function(i) PlotMDS(i))
+
+################################
+# 5.1 - Calibração de Parâmetros
+################################
+# --> Subconjunto de teste   (x7)
+# --> 5x replicações         (x5)
+# --> Pop: 200 - 500 - 1000  (x3)
+# --> Iter: 200 - 500 - 1000 (x3)
+# --> grid.type: ESG - ASG   (x2)
+
+
 
 ##############################################
 # 5.2.1 - Análise de Estabilidade do algoritmo
@@ -48,11 +55,11 @@ subset_cluster_mds_data <- list.files("00_Data/Processed/Clustering/Subset/", fu
 # --> 10 replicações x 7 bases x 2 composições de grade (demais parâmetros default)
 # --> Objetivo: Avaliar estabilidade em termos das diferentes composições de grade
 
-# sim_ESG <- lapply(subset_cluster_mds_data, function(i) {
+# sim_ESG <- lapply(test_subset_data, function(i) {
 #     replicate(10, STATGDBC(i, alpha=.05, only.ics=0, grid.type="esg", density.test="clarkevans", clust.fobj="silhouette"))
 # }); saveRDS(sim_ESG, '00_Data/Results/Stability_Assessment/ESG/sim_ESG_v1.rds') # Approx 15 mints
 
-# sim_ASG <- lapply(subset_cluster_mds_data, function(i) {
+# sim_ASG <- lapply(test_subset_data, function(i) {
 #     replicate(10, STATGDBC(i, alpha=.05, only.ics=0, grid.type="asg", density.test="clarkevans", clust.fobj="silhouette"))
 # }); saveRDS(sim_ASG, '00_Data/Results/Stability_Assessment/ASG/sim_ASG_v1.rds') # Approx 2hrs
 
@@ -182,7 +189,7 @@ lapply(1:length(sim_ASG), function(i) {
 #    ,"WAVEFORM21"              
 # )
 
-# clust_ESG_results <- lapply(c(all_cluster_mds_data, subset_cluster_mds_data), function(i)
+# clust_ESG_results <- lapply(c(all_cluster_mds_data, test_subset_data), function(i)
 #     STATGDBC(i, alpha=.05, only.ics=0, grid.type="esg", density.test="clarkevans", clust.fobj="silhouette")
 # ); saveRDS(clust_ESG_results, '00_Data/Results/Clustering/ESG/clust_ESG_v1.rds') # Approx. 17 mints
 
@@ -201,7 +208,7 @@ lapply(1:length(sim_ASG), function(i) {
 #     "ICS" = unlist(clust_esg_ics)
 # ) %>% fwrite('00_Data/Results/Clustering/ESG/ESG_Results_v1.csv', sep = ';')
 
-# clust_ASG_results <- lapply(c(all_cluster_mds_data, subset_cluster_mds_data), function(i)
+# clust_ASG_results <- lapply(c(all_cluster_mds_data, test_subset_data), function(i)
 #     STATGDBC(i, alpha=.05, only.ics=0, grid.type="asg", density.test="clarkevans", clust.fobj="silhouette")
 # ); saveRDS(clust_ASG_results, '00_Data/Results/Clustering/ASG/clust_ASG_v1.rds') # Approx. 3hrs
 

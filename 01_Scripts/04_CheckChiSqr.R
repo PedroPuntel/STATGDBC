@@ -31,8 +31,8 @@ CheckChiSqr <- function(ppp.object, this.grid, asymetrical = F) {
         
     } else {
         
-        xbreaks <- this.grid[[1]]
-        ybreaks <- this.grid[[2]]
+        xbreaks <- as.numeric(this.grid[[1]])
+        ybreaks <- as.numeric(this.grid[[2]])
         
         # Identifica o total de células da grade
         m <- (length(xbreaks)-1) * (length(ybreaks)-1)

@@ -12,27 +12,27 @@ require("dplyr")
 require("data.table")
 require("spatstat.core")
 require("spatstat.geom")
-options(scipen = 999, digits = 6)
+options(scipen = 999)
 
 ############
 # Validações
 ############
-# mds.proj <- c(all_cluster_mds_data, subset_cluster_mds_data)[[21]]
-# alpha=.05; only.ics=0; iter=100; tol=20; p=1000; pe=0.175; pm=0.2; rho=0.65; verbose=F
+mds.proj <- all_cluster_mds_data[[1]] # 1 - 3 - 14 - 24
+alpha=.05; only.ics=0; iter=200; tol=0.2; p=200; pe=0.25; pm=0.3; rho=0.8; verbose=T
 
 # Rotina principal que implementa a abordagem proposta de ASG como um todo
-ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=100, tol=20, p=1000, pe=0.175, pm=0.2, rho=0.65, verbose=F) {
+ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=200, pe=0.25, pm=0.3, rho=0.8, verbose=F) {
     
     # --> Entradas
     # . mds.proj <matrix>: Projeção resultante da rotina MDSProjection()
     # . alpha <float>: Nível de significância para o Teste dos Quadrats. Default é 5%.
     # . only.ics <int>: Se '1' (TRUE), avalia os grids somente com base no ICS. Se '0' (FALSE), com base no ICS e Teste dos Quadrats.
-    # . iter <int>: Número de iterações do algoritmo. Default é 100.
-    # . tol <int>: Número máximo de gerações sem melhoria na função objetivo permitido. Default é 20.
-    # . p <int>: Tamanho da poplução do algoritmo. Default é 1000.
-    # . pe <int>: Proporção de indivíduos que irão compor o conjunto elite. Default é 0.1.
-    # . pm <int>: Proporção de indivíduos mutantes. Default é 0.2.
-    # . rho <float>: Probabilidade de cruzamento dos indivíduos. Defaul é 0.7.
+    # . iter <int>: Número de iterações do algoritmo. Default é 200.
+    # . tol <int>: Proporção de gerações sem melhoria na função objetivo permitido. Default 20%.
+    # . p <int>: Tamanho da poplução do algoritmo. Default é 200.
+    # . pe <int>: Proporção de indivíduos que irão compor o conjunto elite. Default é 0.25.
+    # . pm <int>: Proporção de indivíduos mutantes. Default é 0.3.
+    # . rho <float>: Probabilidade de cruzamento dos indivíduos. Defaul é 0.8.
     # . verbose <bool>: Se a rotina deve imprimir os resultados da função objetivo ao longo das iteracoes. Default é FALSE.
     
     # --> Saídas:
@@ -55,38 +55,18 @@ ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=100, tol=20, p=1000, 
         min_y <- y.dim.info[1]; max_y <- y.dim.info[2]; min_delta_y <- y.dim.info[4]
         
         # Enumera todas as escolhas de intervalos possíveis para cada eixo (considerando tamanho mínimo)
-        all_intervals_in_x <- seq(min_x, max_x, min_delta_x)
-        all_intervals_in_y <- seq(min_y, max_y, min_delta_y)
-        
-        # Enumera os índices dos intervalos passíveis de escolha.
-        # . Necessariamente, as coordenadas mínima e máxima devem fazer parte
-        index_possible_intervals_x <- c(2:(length(all_intervals_in_x)-1))
-        index_possible_intervals_y <- c(2:(length(all_intervals_in_y)-1))
+        all_intervals_in_x <- seq(min_x + min_delta_x, max_x - min_delta_x, min_delta_x)
+        all_intervals_in_y <- seq(min_y + min_delta_y, max_y - min_delta_y, min_delta_y)
         
         # Determina o totald e intervalos possíveis (considerando a restrição [2;N_X],[2;N_Y])
-        n <- nrow(mds.proj)
-        size_x <- length(index_possible_intervals_x); size_y <- length(index_possible_intervals_y)
+        n <- nrow(mds.proj); size_x <- length(all_intervals_in_x); size_y <- length(all_intervals_in_y)
         N_X <- ceiling(min(sqrt(n),size_x)); N_Y <- ceiling(min(sqrt(n),size_y))
         
         # Sorteio dos chaves aleatórias e composição da população
-        # . Amostra sem repetição os intervalos em cada eixo, ordenando-os de forma crescente p/ garantir sequenciamento
+        # . Amostra sem repetição os intervalos em cada eixo
         pop <- lapply(1:p, function(i) list(
-            c(
-                min_x, # Primeiro intervalo  (fixo)
-                
-                # Intervalos aleatorios
-                sort(sample(all_intervals_in_x[index_possible_intervals_x], sample(1:N_X,1), replace=F), decreasing=F),
-                
-                max_x  # Último intervalo (fixo)
-            ),
-            c(
-                min_y, # Primeiro intervalo  (fixo)
-                
-                # Intervalos aleatorios
-                sort(sample(all_intervals_in_y[index_possible_intervals_y], sample(1:N_Y,1), replace=F), decreasing=F),
-                
-                max_y  # Último intervalo  (fixo)
-            )
+            c(min_x, sort( sample(all_intervals_in_x, sample(1:N_X,1), replace=F) ), max_x),
+            c(min_y, sort( sample(all_intervals_in_y, sample(1:N_Y,1), replace=F) ), max_y)
         ))
         
         # Retorna a população
@@ -152,8 +132,8 @@ ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=100, tol=20, p=1000, 
             
             # Constrói o filho
             pop.crossover[[i]] <- c(
-                ifelse(alele_probs[1] <= rho, parent.elite[1], parent.mutant[1]), # Se herda intervalos em x do pai mutante ou pai elite
-                ifelse(alele_probs[2] <= rho, parent.elite[2], parent.mutant[2])  # Se herda intervalos em y do pai mutante ou pai elite
+                ifelse(alele_probs[1] <= rho, parent.elite[1], parent.mutant[1]),
+                ifelse(alele_probs[2] <= rho, parent.elite[2], parent.mutant[2]) 
             )
         }
         
@@ -162,8 +142,7 @@ ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=100, tol=20, p=1000, 
         
     }
     
-    # Implementa a abordagem de BRKGA para o ASG (única viável, tendo em vista o espaço contínuo de indivíduos)
-    # . ASGBRKGA = Asymetric Spaced Grid Biased Random Key Genetic Algorithm
+    # ASGBRKGA = Asymetric Spaced Grid Biased Random Key Genetic Algorithm
     ASGBRKGA <- function(mds.proj, x.dim.info, y.dim.info, grid.ppp, alpha, only.ics, iter, tol, p, pe, pm, rho, verbose) {
         
         # Calcula o tamanho das populações elite, mutante e crossover
@@ -181,12 +160,11 @@ ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=100, tol=20, p=1000, 
         pop <- population(mds.proj, x.dim.info, y.dim.info, p)
         
         # Contadores
-        current.iter <- 0
         current.tol <- 0
         gen <- 1
         
         # Enquanto o critério de parada não for atingido
-        while(current.tol <= iter && current.tol <= tol) {
+        while(gen <= iter && current.tol <= (tol*iter)) {
             
             # Aplica o decodificador
             fit.scores <- lapply(pop, function(i) decoder(i, grid.ppp, alpha, only.ics)) %>% unlist()
@@ -222,6 +200,7 @@ ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=100, tol=20, p=1000, 
                 if(isTRUE(test) || is.na(test)) { # is.na(test) existe pois é possível que o ICS seja NA (raro, porém possível)
                     
                     elite[[gen]] <- elite[[gen-1]]
+                    if (verbose == T) message(paste0("Sem melhoria neste geracao (tol = ",current.tol,")","\n"))
                     current.tol <- current.tol + 1 # ou seja, não houve melhoria nesta geração
                     
                 } else {
@@ -241,20 +220,20 @@ ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=100, tol=20, p=1000, 
             pop <- c(elite[[gen]], indv.crossover, indv.mutants)
             
             # Incrementa os contadores
-            current.iter <- current.iter + 1
             gen <- gen + 1
             
         }
         
         # Remove entradas nulas da lista de indivíduos (caso existam)
-        best.indv[sapply(best.indv, is.null)] <- NULL
+        # best.indv[sapply(best.indv, is.null)] <- NULL
         
         # Retorna os resultados
         return(list(
-            "fit.best" = unique(fit.best[fit.best != 0]),
+            "fit.best" = unique(fit.best),
             "best.indv" = unique(best.indv),
             "ppp.obj" = grid.ppp,
-            "grid.method" = "ASGBRKGA"
+            "grid.method" = "ASGBRKGA",
+            "iter" = gen
         ))
         
     }
@@ -272,8 +251,8 @@ ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=100, tol=20, p=1000, 
     grid.ppp <- as.ppp(mds.proj, owin(xrange=grid.dims$xrange, yrange=grid.dims$yrange))
     
     # Aplica o algoritmo
+    if(verbose == T) message('Abordagem de Grade: ASGBRKGA')
     out <- ASGBRKGA(mds.proj, x.dim.info, y.dim.info, grid.ppp, alpha, only.ics, iter, tol, p, pe, pm, rho, verbose)
-    message('Abordagem de Grade: ASGBRKGA')
     
     # Retorna as informações
     return(out)

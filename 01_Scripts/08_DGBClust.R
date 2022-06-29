@@ -17,7 +17,7 @@ require("cluster")
 require("data.table")
 require("spatstat.core")
 require("spatstat.geom")
-options(scipen = 999, digits = 10) # Alta precisão de ponto flutuante
+options(scipen = 999)
 
 ############
 # Validações
