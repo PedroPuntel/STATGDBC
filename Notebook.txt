@@ -6,7 +6,7 @@ Encoding: UTF-8
 . Deadlines
 -----------
 	--> 04/07: 
-		(STATGDBC) Implementação das correções + resultados brutos
+		(STATGDBC) Implementação das correções + result ados brutos
 		(Monografia) Finalizar capítulo de estatística espacial
 
 -------

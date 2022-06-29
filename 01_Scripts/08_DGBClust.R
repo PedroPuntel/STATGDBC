@@ -7,7 +7,6 @@ source("01_Scripts/03_AxisInfo.R")
 
 # Notas de Desenvolvimento
 # --> TODO: Avaliar tratamento adicional para quando se tenha apenas 1 cluster formado (exceto ruído) e 'clust.fobj=calinski'
-# --> TODO: Avaliar tratamento adicional para descarte de grades muito granulares (por motivos de performance)
 
 # Pacotes & Configurações
 require("fpc")
@@ -29,9 +28,10 @@ options(scipen = 999)
 # lapply(test$grids, function(i) PlotGrid(test$spatial.ppp.obj, i, T))
 
 # Rotina principal que implementa a abordagem proposta do DGBClust como um todo
-DGBClust_main <- function(ppp.obj, elite.grids, elite.grids.scores, which.method, alpha=.05, density.test='clarkevans', clust.fobj="silhouette") {
+DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.method, alpha=.05, density.test='clarkevans', clust.fobj="silhouette") {
     
     # --> Entradas
+    # . data <data.table | data.frame>: Conjunto de dados
     # . ppp.obj <ppp>: Objeto ppp (retornado pelos algoritmos na etapa de grade) associado a instância avaliada
     # . elite.grids <list>: Conjunto elite de indivíduos propagados da etapa de grade
     # . elite.grids.scores <list>: Scores associados ao indivíduos do conjunto elite
@@ -358,7 +358,7 @@ DGBClust_main <- function(ppp.obj, elite.grids, elite.grids.scores, which.method
     }
     
     # Rotina auxiliar que dado um vetor de clusters, calcula os Índices de Silhueta/Calinksi-Harabasz
-    assess_cluster_quality <- function(this.cluster, clust.fobj) {
+    assess_cluster_quality <- function(data, this.cluster, clust.fobj) {
         
         # this.cluster <- points_cluster_mapping
 
