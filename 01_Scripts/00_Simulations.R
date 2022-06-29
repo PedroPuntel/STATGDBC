@@ -12,6 +12,7 @@ source("01_Scripts/04_PlotGrid.R")
 options(digits = 3)
 
 # Pacotes
+require("data.table")
 require("pdfCluster")
 
 ####################
@@ -28,10 +29,10 @@ get_adj_rand_index <- function(statgdbc.obj, k.real) {
 ################################
 
 # Leitura das projeções EMD (dados de clusterização)
-all_cluster_mds_data <- list.files("00_Data/Processed/Clustering/All/", full.names = T) %>% sort() %>% lapply(fread) %>% lapply(as.matrix)
+all_cluster_data <- list.files("00_Data/Raw/Clustering/", full.names = T) %>% sort() %>% lapply(fread) %>% lapply(as.data.table)
 
 # Leitura das projeções EMD (dados de classificação)
-all_classf_mds_data <- list.files("00_Data/Processed/Classification/MDS/", full.names = T) %>% sort() %>% lapply(fread) %>% lapply(as.matrix)
+all_classf_data <- list.files("00_Data/Processed/Classification/MDS/", full.names = T) %>% sort() %>% lapply(fread) %>% lapply(as.matrix)
 all_classf_clusters <- list.files("00_Data/Processed/Classification/Clusters/", full.names = T) %>% sort() %>% lapply(fread) %>% lapply(as.matrix)
 
 # Subconjunto de teste
@@ -189,7 +190,7 @@ lapply(1:length(sim_ASG), function(i) {
 #    ,"WAVEFORM21"              
 # )
 
-# clust_ESG_results <- lapply(c(all_cluster_mds_data, test_subset_data), function(i)
+# clust_ESG_results <- lapply(c(all_cluster_data, test_subset_data), function(i)
 #     STATGDBC(i, alpha=.05, only.ics=0, grid.type="esg", density.test="clarkevans", clust.fobj="silhouette")
 # ); saveRDS(clust_ESG_results, '00_Data/Results/Clustering/ESG/clust_ESG_v1.rds') # Approx. 17 mints
 
@@ -208,7 +209,7 @@ lapply(1:length(sim_ASG), function(i) {
 #     "ICS" = unlist(clust_esg_ics)
 # ) %>% fwrite('00_Data/Results/Clustering/ESG/ESG_Results_v1.csv', sep = ';')
 
-# clust_ASG_results <- lapply(c(all_cluster_mds_data, test_subset_data), function(i)
+# clust_ASG_results <- lapply(c(all_cluster_data, test_subset_data), function(i)
 #     STATGDBC(i, alpha=.05, only.ics=0, grid.type="asg", density.test="clarkevans", clust.fobj="silhouette")
 # ); saveRDS(clust_ASG_results, '00_Data/Results/Clustering/ASG/clust_ASG_v1.rds') # Approx. 3hrs
 
@@ -227,7 +228,7 @@ lapply(1:length(sim_ASG), function(i) {
 #     "ICS" = unlist(clust_asg_ics)
 # ) %>% fwrite('00_Data/Results/Clustering/ASG/ASG_Results_v1.csv', sep = ';')
 
-# classf_ESG_results <- lapply(all_classf_mds_data, function(i)
+# classf_ESG_results <- lapply(all_classf_data, function(i)
 #     STATGDBC(i, alpha=.05, only.ics=0, grid.type="esg", density.test="clarkevans", clust.fobj="silhouette")
 # ); saveRDS(classf_ESG_results, '00_Data/Results/Classification/ESG/classf_ESG_v1.rds') # Approx. 10 mints
 
@@ -271,7 +272,7 @@ data.table(
     "ICS" = unlist(classf_esg_ics)
 ) %>% fwrite('00_Data/Results/Classification/ESG/ESG_Results_v1.csv', sep = ';')
 
-# classf_ASG_results <- lapply(all_classf_mds_data, function(i)
+# classf_ASG_results <- lapply(all_classf_data, function(i)
 #     STATGDBC(i, alpha=.05, only.ics=0, grid.type="asg", density.test="clarkevans", clust.fobj="silhouette")
 # ); saveRDS(classf_ASG_results, '00_Data/Results/Classification/ASG/classf_ASG_v1.rds') # Approx. 40 mints
 

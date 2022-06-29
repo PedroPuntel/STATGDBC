@@ -6,15 +6,16 @@
 # --> TODO: Implementar lógica que permita ao usuário fornecer valores aos parâmetros do BRKGA
 
 # Imports
+source("01_Scripts/02_MDSProjection.R")
 source("01_Scripts/06_ESG.R")
 source("01_Scripts/07_ASG.R")
 source("01_Scripts/08_DGBClust.R")
 
 # Rotina que implementa o algoritmo STATGDBC por completo
-STATGDBC <- function(mds.proj, alpha=.05, only.ics=0, grid.type="esg", density.test="hopkins", clust.fobj="silhouette") {
+STATGDBC <- function(data, alpha=.05, only.ics=0, grid.type="esg", density.test="hopkins", clust.fobj="silhouette") {
     
     # --> Entradas:
-    # . mds.proj <matrix>: Projeção bidimensional N x 2 resultante do Escalonamento Multidimensional
+    # . data <data.table | data.frame>: Conjunto de dados
     # . alpha <float>: Nível de significância considerado no testes estatísticos. Default é 5%.
     # . only.ics <int>: Se '1' (TRUE), avalia os grids somente com base no ICS. Se '0' (FALSE), com utiliza além do ICS o Teste dos Quadrats.
     # . grid.type <str>: Tipo de composição de grade a ser considerada, sendo um dentre 'esg' ou 'asg'. Default é 'asg'.
@@ -45,6 +46,12 @@ STATGDBC <- function(mds.proj, alpha=.05, only.ics=0, grid.type="esg", density.t
     # Inicia o cronômetro
     tic <- Sys.time()
     
+        ###################
+        # Pré-Processamento
+        ###################
+        
+        mds.proj <- MDSProjection(data)
+    
         #########################
         # Fase 1 - Etapa de Grade
         #########################
@@ -74,6 +81,7 @@ STATGDBC <- function(mds.proj, alpha=.05, only.ics=0, grid.type="esg", density.t
         #############################
         
         density.results <- DGBClust_main(
+            data = data,
             ppp.obj = grid.results$ppp.obj,
             elite.grids = grid.results$best.indv,
             elite.grids.scores = grid.results$fit.best,

@@ -17,7 +17,7 @@ options(scipen = 999)
 ############
 # Validações
 ############
-# mds.proj <- all_cluster_mds_data[[14]] # 1 - 3 - 14 - 24
+# mds.proj <- all_cluster_mds_data[[c(1,3,14,24)]] # 1 - 3 - 14 - 24
 # alpha=.05; only.ics=0; iter=200; tol=0.2; p=200; pe=0.25; pm=0.3; rho=0.8; verbose=T
 
 # Rotina principal que implementa a abordagem proposta de ESG como um todo
