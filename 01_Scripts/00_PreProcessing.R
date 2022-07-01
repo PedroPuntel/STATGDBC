@@ -95,7 +95,11 @@ all_classf_data <- lapply(all_classf_data, function(i) as.data.frame(i)) %>% lap
 
 # Nomeção dos arquivos de saída
 all_classf_destinations <- lapply(list.files("00_Data/Raw/Classification/"), function(i) paste0("00_Data/Processed/Classification/",i))
+<<<<<<< HEAD
 all_classf_cvec_destinations <- lapply(list.files("00_Data/Raw/Classification/"), function(i) paste0("00_Data/Processed/Classification/Clusters/CVEC_",i))
+=======
+all_classf_cvec_destinations <- lapply(list.files("00_Data/Raw/Classification/"), function(i) paste0("00_Data/Processed/Classification/CVEC_",i))
+>>>>>>> 2d0ba7a516f2873ffe1978096d595c94857f8ed7
 
 # Salva os resultados
 lapply(1:length(all_classf_data), function(i) fwrite(all_classf_data[[i]], all_classf_destinations[[i]], sep=";"))

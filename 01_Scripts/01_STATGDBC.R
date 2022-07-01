@@ -11,8 +11,13 @@ source("01_Scripts/06_ESG.R")
 source("01_Scripts/07_ASG.R")
 source("01_Scripts/08_DGBClust.R")
 
+############
+# Validações
+############
+# mds_projections <- lapply(c(1,3,14,24), function(i) MDSProjection(all_cluster_data[[i]]))
+
 # Rotina que implementa o algoritmo STATGDBC por completo
-STATGDBC <- function(data, alpha=.05, only.ics=0, grid.type="esg", density.test="hopkins", clust.fobj="silhouette") {
+STATGDBC <- function(data, alpha=.05, only.ics=0, grid.type="esg", density.test="clarkevans", clust.fobj="silhouette", p, iter) {
     
     # --> Entradas:
     # . data <data.table | data.frame>: Conjunto de dados
@@ -20,7 +25,7 @@ STATGDBC <- function(data, alpha=.05, only.ics=0, grid.type="esg", density.test=
     # . only.ics <int>: Se '1' (TRUE), avalia os grids somente com base no ICS. Se '0' (FALSE), com utiliza além do ICS o Teste dos Quadrats.
     # . grid.type <str>: Tipo de composição de grade a ser considerada, sendo um dentre 'esg' ou 'asg'. Default é 'asg'.
     # . density.test <str>: Teste estatístico a ser utilizado na etapa de densidade. Um dentre 'hopkins' e 'clarkevans'. Default é 'clarkevans'.
-    # . clust.fobj <str>: Função objetivo para avaliação dos clusters na etapa de densidade. Um dentre 'silhouette' e 'calinski'. Default é 'clarkevans'.
+    # . clust.fobj <str>: Função objetivo para avaliação dos clusters na etapa de densidade. Um dentre 'silhouette' e 'calinski'. Default é 'silhouette'.
 
     # --> Saídas (BFESGA)
     # . cluster <vector> : 
@@ -50,7 +55,7 @@ STATGDBC <- function(data, alpha=.05, only.ics=0, grid.type="esg", density.test=
         # Pré-Processamento
         ###################
         
-        mds.proj <- MDSProjection(data)
+        mds.proj <- MDSProjection(as.data.frame(data))
     
         #########################
         # Fase 1 - Etapa de Grade
@@ -62,7 +67,9 @@ STATGDBC <- function(data, alpha=.05, only.ics=0, grid.type="esg", density.test=
             grid.results <- ESG_main(
                 mds.proj = mds.proj,
                 alpha = alpha,
-                only.ics = only.ics
+                only.ics = only.ics,
+                iter = iter,
+                p = p                
             )
             
         } else {
@@ -71,7 +78,9 @@ STATGDBC <- function(data, alpha=.05, only.ics=0, grid.type="esg", density.test=
             grid.results <- ASG_main(
                 mds.proj = mds.proj,
                 alpha = alpha,
-                only.ics = only.ics
+                only.ics = only.ics,
+                iter = iter,
+                p = p
             )
             
         }
@@ -81,7 +90,7 @@ STATGDBC <- function(data, alpha=.05, only.ics=0, grid.type="esg", density.test=
         #############################
         
         density.results <- DGBClust_main(
-            data = data,
+            data = as.data.frame(data),
             ppp.obj = grid.results$ppp.obj,
             elite.grids = grid.results$best.indv,
             elite.grids.scores = grid.results$fit.best,

@@ -16,8 +16,6 @@ Encoding: UTF-8
 	-----------
 	. STATGDBC:
 	-----------
-		--> DGBClust: Utilizar matriz de distâncias original dos dados para cálculo dos índices de avaliação (silhuete e calinski)
-		--> DGBClust: Questão dos testes estatísticos de hopkins/clark-evans: Mesclagem quando houver regularidade e/ou aleatoriedade espacial
 		--> DBSCAN: Estudar como utilizá-lo e já calcular também os seus resultados para ir comparando
 	
 	-------------

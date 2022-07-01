@@ -14,22 +14,16 @@ require("spatstat.core")
 require("spatstat.geom")
 options(scipen = 999)
 
-############
-# Validações
-############
-mds.proj <- all_cluster_mds_data[[1]] # 1 - 3 - 14 - 24
-alpha=.05; only.ics=0; iter=200; tol=0.2; p=200; pe=0.25; pm=0.3; rho=0.8; verbose=T
-
 # Rotina principal que implementa a abordagem proposta de ASG como um todo
-ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=200, pe=0.25, pm=0.3, rho=0.8, verbose=F) {
+ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=300, tol=0.2, p=200, pe=0.25, pm=0.3, rho=0.8, verbose=F) {
     
     # --> Entradas
     # . mds.proj <matrix>: Projeção resultante da rotina MDSProjection()
     # . alpha <float>: Nível de significância para o Teste dos Quadrats. Default é 5%.
     # . only.ics <int>: Se '1' (TRUE), avalia os grids somente com base no ICS. Se '0' (FALSE), com base no ICS e Teste dos Quadrats.
-    # . iter <int>: Número de iterações do algoritmo. Default é 200.
+    # . iter <int>: Número de iterações do algoritmo. Default é 300 (definido com base em estudo de calibração de parâmetros)
     # . tol <int>: Proporção de gerações sem melhoria na função objetivo permitido. Default 20%.
-    # . p <int>: Tamanho da poplução do algoritmo. Default é 200.
+    # . p <int>: Tamanho da poplução do algoritmo. Default é 200 (definido com base em estudo de calibração de parâmetros)
     # . pe <int>: Proporção de indivíduos que irão compor o conjunto elite. Default é 0.25.
     # . pm <int>: Proporção de indivíduos mutantes. Default é 0.3.
     # . rho <float>: Probabilidade de cruzamento dos indivíduos. Defaul é 0.8.
@@ -39,8 +33,10 @@ ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=200, 
     # Objeto tipo lista, contendo:
     # . fit.best: Melhor valor encontrado da função objetivo em cada iteração
     # . best.indv: Melhores indivíduos de cada iteração
-    # . elite.indvs: Conjunto elite indivíduos
-    # . ppp.obj: Objeto ppp associado ao grid (para plotagem)
+    # . fit.scores: Scores dos indivíduos (distintos) do conjunto elite
+    # . all.indv: Indivíduos (distintos) do conjunto elite
+    # . ppp.obj: Objeto ppp associado ao grid
+    # . iter: Número de iterações necessárias
     
     ####################
     # Rotinas Auxiliares
@@ -200,7 +196,7 @@ ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=200, 
                 if(isTRUE(test) || is.na(test)) { # is.na(test) existe pois é possível que o ICS seja NA (raro, porém possível)
                     
                     elite[[gen]] <- elite[[gen-1]]
-                    if (verbose == T) message(paste0("Sem melhoria neste geracao (tol = ",current.tol,")","\n"))
+                    if (verbose == T) message(paste0("Sem melhoria nesta geracao (tol = ",current.tol,")","\n"))
                     current.tol <- current.tol + 1 # ou seja, não houve melhoria nesta geração
                     
                 } else {
@@ -225,12 +221,14 @@ ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=200, 
         }
         
         # Remove entradas nulas da lista de indivíduos (caso existam)
-        # best.indv[sapply(best.indv, is.null)] <- NULL
+        best.indv[sapply(best.indv, is.null)] <- NULL
         
         # Retorna os resultados
         return(list(
-            "fit.best" = unique(fit.best),
-            "best.indv" = unique(best.indv),
+            "fit.best" = max(unique(fit.best[fit.best != 0])),
+            "best.indv" = unique(best.indv[fit.best != 0])[which.max(unique(fit.best[fit.best != 0]))],
+            "fit.scores" = unique(fit.best[fit.best != 0]),
+            "all.indv" = unique(best.indv[fit.best != 0]),
             "ppp.obj" = grid.ppp,
             "grid.method" = "ASGBRKGA",
             "iter" = gen
@@ -251,7 +249,8 @@ ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=200, 
     grid.ppp <- as.ppp(mds.proj, owin(xrange=grid.dims$xrange, yrange=grid.dims$yrange))
     
     # Aplica o algoritmo
-    if(verbose == T) message('Abordagem de Grade: ASGBRKGA')
+    # if(verbose == T) message('Abordagem de Grade: ASGBRKGA')
+    message('Abordagem de Grade: ASGBRKGA')
     out <- ASGBRKGA(mds.proj, x.dim.info, y.dim.info, grid.ppp, alpha, only.ics, iter, tol, p, pe, pm, rho, verbose)
     
     # Retorna as informações
@@ -259,3 +258,8 @@ ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=200, 
     
 }
 
+############
+# Validações
+############
+# asg_outputs <- lapply(mds_projections, function(i) ASG_main(i, verbose=T)) # Approx. 2min
+# lapply(asg_outputs, function(i) PlotGrid(i$ppp.obj, i$best.indv[[1]], T))

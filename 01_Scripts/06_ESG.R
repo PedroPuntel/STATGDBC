@@ -14,33 +14,29 @@ require("spatstat.core")
 require("spatstat.geom")
 options(scipen = 999)
 
-############
-# Validações
-############
-# mds.proj <- all_cluster_mds_data[[c(1,3,14,24)]] # 1 - 3 - 14 - 24
-# alpha=.05; only.ics=0; iter=200; tol=0.2; p=200; pe=0.25; pm=0.3; rho=0.8; verbose=T
-
 # Rotina principal que implementa a abordagem proposta de ESG como um todo
-ESG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=200, pe=0.25, pm=0.3, rho=0.8, verbose=F) {
+ESG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=100, pe=0.25, pm=0.3, rho=0.8, verbose=F) {
     
     # --> Entradas (fornecidas pelo usuário)
     # . mds.proj <matrix>: Projeção resultante da rotina MDSProjection()
-    # . alpha <float>: Nível de significância para o Teste dos Quadrats. Default é 5%.
-    # . only.ics <int>: Se '1' (TRUE), avalia os grids somente com base no ICS. Se '0' (FALSE), com base no ICS e Teste dos Quadrats.
-    # . iter <int>: Número de iterações do algoritmo. Default é 200.
-    # . tol <int>: Proporção de gerações sem melhoria na função objetivo permitido. Default 20%.
-    # . p <int>: Tamanho da poplução do algoritmo. Default é 200.
-    # . pe <int>: Proporção de indivíduos que irão compor o conjunto elite. Default é 0.25.
-    # . pm <int>: Proporção de indivíduos mutantes. Default é 0.3.
-    # . rho <float>: Probabilidade de cruzamento dos indivíduos. Defaul é 0.8.
-    # . verbose <bool>: Se a rotina deve imprimir os resultados da função objetivo ao longo das iteracoes. Default é FALSE.
+    # . alpha <float>: Nível de significância para o Teste dos Quadrats. Default é 5%
+    # . only.ics <int>: Se '1' (TRUE), avalia os grids somente com base no ICS. Se '0' (FALSE), com base no ICS e Teste dos Quadrats
+    # . iter <int>: Número de iterações do algoritmo. Default é 200 (definido com base em estudo de calibração de parâmetros)
+    # . tol <int>: Proporção de gerações sem melhoria na função objetivo permitido. Default 20%
+    # . p <int>: Tamanho da poplução do algoritmo. Default é 100 (definido com base em estudo de calibração de parâmetros)
+    # . pe <int>: Proporção de indivíduos que irão compor o conjunto elite. Default é 0.25
+    # . pm <int>: Proporção de indivíduos mutantes. Default é 0.3
+    # . rho <float>: Probabilidade de cruzamento dos indivíduos. Defaul é 0.8
+    # . verbose <bool>: Se a rotina deve imprimir os resultados da função objetivo ao longo das iteracoes. Default é FALSE
 
     # --> Saídas:
     # Objeto tipo lista, contendo:
-    # . fit.best: Melhor valor encontrado da função objetivo em cada iteração
-    # . best.indv: Melhores indivíduos de cada iteração
-    # . elite.indvs: Conjunto elite indivíduos
-    # . ppp.obj: Objeto ppp associado ao grid (para plotagem)
+    # . fit.best: Melhor valor encontrado da função objetivo
+    # . best.indv: Melhor indivíduo
+    # . fit.scores: Scores dos indivíduos (distintos) do conjunto elite
+    # . all.indv: Indivíduos (distintos) do conjunto elite
+    # . ppp.obj: Objeto ppp associado ao grid
+    # . iter: Número de iterações necessárias
     
     ####################
     # Rotinas Auxiliares
@@ -194,7 +190,7 @@ ESG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=200, 
                 if(isTRUE(test) || is.na(test)) { # is.na(test) existe pois é possível que o ICS seja NA
                     
                     elite[[gen]] <- elite[[gen-1]]
-                    if (verbose == T) message(paste0("Sem melhoria neste geracao (tol = ",current.tol,")","\n"))
+                    if (verbose == T) message(paste0("Sem melhoria nesta geracao (tol = ",current.tol,")","\n"))
                     current.tol <- current.tol + 1 # ou seja, não houve melhoria nesta geração
                     
                 } else {
@@ -223,8 +219,10 @@ ESG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=200, 
         
         # Retorna os resultados
         return(list(
-            "fit.best" = unique(fit.best[fit.best != 0]),
-            "best.indv" = unique(best.indv),
+            "fit.best" = max(unique(fit.best[fit.best != 0])),
+            "best.indv" = unique(best.indv[fit.best != 0])[which.max(unique(fit.best[fit.best != 0]))],
+            "fit.scores" = unique(fit.best[fit.best != 0]),
+            "all.indv" = unique(best.indv[fit.best != 0]),
             "ppp.obj" = grid.ppp,
             "grid.method" = "ESGBRKGA",
             "iter" = gen
@@ -250,8 +248,11 @@ ESG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=200, 
         return(list(
             "fit.best" = all_grids$scores[1],
             "best.indv" = all_grids[1,1:2],
+            "fit.scores" = all_grids$scores,
+            "all.indv" = all_grids[,1:2],
             "ppp.obj" = grid.ppp,
-            "grid.method" = "BFESGA"
+            "grid.method" = "BFESGA",
+            "iter" = nrow(all_grids)
         ))
         
     }
@@ -277,20 +278,31 @@ ESG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=200, 
     n_grids <- getMaxNumGrids(mds.proj, N_X, N_Y)
     
     # Decide qual abordagem utilizar
-    if (n_grids >= 1000) {
-        
-        if(verbose == T) message('Abordagem de Grade: ESGBRKGA')
-        out <- ESGBRKGA(mds.proj, N_X, N_Y, grid.ppp, alpha, only.ics, iter, tol, p, pe, pm, rho, verbose)
-        
-    } else {
-        
-        if(verbose == T) message('Abordagem de Grade: BFESGA')
-        out <- BFESGA(mds.proj, N_X, N_Y, grid.ppp, alpha, only.ics)
-        
-    }
+    # if (n_grids >= 1000) {
+    #     
+    #     # if(verbose == T) message('Abordagem de Grade: ESGBRKGA')
+    #     message('Abordagem de Grade: ESGBRKGA')
+    #     out <- ESGBRKGA(mds.proj, N_X, N_Y, grid.ppp, alpha, only.ics, iter, tol, p, pe, pm, rho, verbose)
+    #     
+    # } else {
+    #     
+    #     # if(verbose == T) message('Abordagem de Grade: BFESGA')
+    #     message('Abordagem de Grade: BFESGA')
+    #     out <- BFESGA(mds.proj, N_X, N_Y, grid.ppp, alpha, only.ics)
+    #     
+    # }
+    
+    # Temporário: Força execução via ESGBRKGA
+    message('Abordagem de Grade: ESGBRKGA')
+    out <- ESGBRKGA(mds.proj, N_X, N_Y, grid.ppp, alpha, only.ics, iter, tol, p, pe, pm, rho, verbose)
     
     # Retorna as informações
     return(out)
     
 }
 
+############
+# Validações
+############
+# esg_outputs <- lapply(mds_projections, function(i) ESG_main(i, verbose=T)) # ~ Approx 1min
+# lapply(esg_outputs, function(i) PlotGrid(i$ppp.obj, i$best.indv, F))

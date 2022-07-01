@@ -26,30 +26,78 @@ get_adj_rand_index <- function(statgdbc.obj, k.real) {
 ################################
 
 # Leitura das projeções EMD (dados de clusterização)
-all_cluster_data <- list.files("00_Data/Processed/Clustering/", full.names = T) %>% sort() %>% lapply(fread)
+all_cluster_data <- list.files("00_Data/Processed/Clustering/", full.names = T) %>% sort() %>% lapply(fread) %>% lapply(as.data.frame)
 
 # Leitura das projeções EMD (dados de classificação)
-all_classf_data <- list.files("00_Data/Processed/Classification/", pattern="CLASSF*", full.names = T) %>% sort() %>% lapply(fread)
-all_classf_clusters <- list.files("00_Data/Processed/Classification/Clusters/", full.names = T) %>% sort() %>% lapply(fread)
+all_classf_data <- list.files("00_Data/Processed/Classification/", pattern="CLASSF*", full.names = T) %>% sort() %>% lapply(fread) %>% lapply(as.data.frame)
+all_classf_clusters <- list.files("00_Data/Processed/Classification/Clusters/", full.names = T) %>% sort() %>% lapply(fread) %>% lapply(as.data.frame)
 
 # Subconjunto de teste
-test_subset_data <- list.files("00_Data/Processed/Subset/", full.names = T) %>% sort() %>% lapply(fread)
+test_subset_data <- list.files("00_Data/Processed/Subset/", full.names = T) %>% sort() %>% lapply(fread) %>% lapply(as.data.frame)
 
-################################
-# 5.1 - Calibração de Parâmetros
-################################
-# --> Subconjunto de teste   (x7)
-# --> 5x replicações         (x5)
-# --> Pop: 200 - 500 - 1000  (x3)
-# --> Iter: 200 - 500 - 1000 (x3)
-# --> grid.type: ESG - ASG   (x2)
+######################################
+# 5.1 - Calibração de Parâmetros BRKGA
+######################################
+# --> 3 replicações x 7 bases de teste x 3 tamanhos de pop. x 3 tamanhos de ger. x 2 composições de grade: 378 execuções
+# --> Objetivo: Por limitação de tempo, calibração dos parâmetros mais impactantes do BRKGA (demais seguem sugestão da literatura)
 
+# Produto cartesiano dos parâmetros
+params <- expand.grid(
+    c(1:7),          # Conjuntos de dados
+    c(100,200,300),  # Tamanho de População
+    c(200,300,500),  # Número de gerações
+    c("esg","asg")   # Composição de grade
+) %>% as.data.frame()
+colnames(params) <- c("datasets","p","iter","grid.type")
 
+# Simulações (Approx 6hrs)
+# cal_results <- lapply(1:nrow(params), function(i) {
+#     replicate(3, STATGDBC(data = test_subset_data[params$datasets[i]], grid.type = params$grid.type[i], p = params$p[i], iter = params$iter[i]))
+# }); saveRDS(cal_results, "00_Data/Results/Parameter_Calibration/Calibration_Results_v1.rds")
+cal_results <- readRDS("00_Data/Results/Parameter_Calibration/Calibration_Results_v1.rds")
+
+# Inclusão do nome dos datasets
+ds_names <- data.frame(datasets = c(1:7), names = c("2-FACE","BROKEN-RING","BUPA","FORESTFIRES","GAUSS9","UNIFORM700","VOWEL2"))
+params <- params %>% left_join(ds_names, on='datasets') %>% select(c('names','p','iter','grid.type'))
+params$grid.type <- ifelse(params$grid.type == 'esg', 'ESGBRKGA', 'ASGBRKGA')
+params <- rename(params, grid.algo = grid.type)
+
+# Resultados
+params$mean_ISM <- sapply(cal_results, function(i) mean(unlist(i['score',]))) %>% unlist()
+params$mean_K <- sapply(cal_results, function(i) mean(unlist(i['k',]))) %>% unlist()
+params$mean_T <- sapply(cal_results, function(i) mean(unlist(i['exec',]))) %>% unlist()
+
+# Análise - Melhor combinação de parâmetros por algoritmo de grade
+cal_results_ESGBRKGA <- params %>%
+    group_by(grid.algo, p, iter) %>% 
+    summarise(Mean_ISM = mean(mean_ISM), Mean_T = mean(mean_T)) %>% 
+    arrange(desc(Mean_ISM)) %>% 
+    filter(grid.algo == 'ESGBRKGA')
+
+cal_results_ASGBRKGA <- params %>%
+    group_by(grid.algo, p, iter) %>% 
+    summarise(Mean_ISM = mean(mean_ISM), Mean_T = mean(mean_T)) %>% 
+    arrange(desc(Mean_ISM)) %>% 
+    filter(grid.algo == 'ASGBRKGA')
+
+cal_results_ESGBRKGA; cal_results_ASGBRKGA
+
+# Comentários
+# . Em geral, ainda persistem valores bem baixos de silhueta (independente da abordagem de grade)
+# . Contudo, novamente valores superiores de silhueta para a abordagem assimétrica, porém não tão significantes levando-se em consideração o tempo de execução
+# . ASGBRKGA mais sensível a escolha dos parâmetros 'iter' e 'p' (apesar de variabilidade pequena). Melhores valores: (p = 200, iter = 300)
+# . ESGBRKGA praticamente invariante a escolha de parâmetros, de forma que a escolha dos parâmetros 'menos custosos' é justificável (p = 100, iter = 200)
+
+# Conclusão:
+# . Parâmetros p/ ESGBRKGA: p = 100 | iter = 200
+# . Parâmetros p/ ASGBRKGA: p = 200 | iter = 300
+
+# TODO - Gráficos comparativos
 
 ##############################################
 # 5.2.1 - Análise de Estabilidade do algoritmo
 ##############################################
-# --> 10 replicações x 7 bases x 2 composições de grade (demais parâmetros default)
+# --> 10 replicações x 7 bases x 2 composições de grade)
 # --> Objetivo: Avaliar estabilidade em termos das diferentes composições de grade
 
 # sim_ESG <- lapply(test_subset_data, function(i) {

@@ -6,12 +6,12 @@
 MDSProjection <- function(data) {
     
     # --> Entradas:
-    # . data <data.table, data.frame, tibble ...>: Conjunto de dados convertível para matrix.
+    # . data <data.frame.>: Conjunto de dados convertível para matrix.
     
     # --> Saídas:
     # . data <matrix>: Projeção de dimensção N x 2 resultante do Escalonamento Multidimensional
 
-    # Padronização Z-score (se desejado)
+    # Padronização Z-score
     data <- apply(X=data, MARGIN=2, function(j) { (j-mean(j))/sd(j) })
     
     # Matriz de distâncias

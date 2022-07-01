@@ -5,9 +5,6 @@
 # Imports
 source("01_Scripts/03_AxisInfo.R")
 
-# Notas de Desenvolvimento
-# --> TODO: Avaliar tratamento adicional para quando se tenha apenas 1 cluster formado (exceto ruído) e 'clust.fobj=calinski'
-
 # Pacotes & Configurações
 require("fpc")
 require("dplyr")    
@@ -17,15 +14,6 @@ require("data.table")
 require("spatstat.core")
 require("spatstat.geom")
 options(scipen = 999)
-
-############
-# Validações
-############
-# --> Conjuntos de dados que deram problema
-# source("01_Scripts/04_PlotGrid.R")
-# ppp.obj <- test$spatial.ppp.obj; elite.grids <- test$grids; elite.grids.scores <- test$grids.ics
-# which.method <- 'ASGBRKGA'; alpha=.05; density.test='clarkevans'; clust.fobj="silhouette"
-# lapply(test$grids, function(i) PlotGrid(test$spatial.ppp.obj, i, T))
 
 # Rotina principal que implementa a abordagem proposta do DGBClust como um todo
 DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.method, alpha=.05, density.test='clarkevans', clust.fobj="silhouette") {
@@ -200,14 +188,15 @@ DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.
             } else {
                 
                 # Do contrário, aplica o teste de Hopkins | ?hopkins::hopkins
-                # OBS: Utiliza os |M|-1 pontos contidos na célula para compor a amostra da estatística de teste
-                m <- nrow(aux)-1
+                # H0: PP ~ CSR
+                # H1: PP != CSR
+                m <- nrow(aux)-1 # Utiliza os |M|-1 pontos contidos na célula para compor a amostra da estatística de teste
                 hopkins_stat <- hopkins(X=aux, m=m)
                 flag_merge <- ifelse(hopkins.pval(hopkins_stat, n=m) > alpha, TRUE, FALSE)
                 #print(hopkins.pval(hopkins_stat, n=m))
                 
                 # Comentário:
-                # Para avliarmos as junções entre as células, queremos juntá-las somente caso tenhamos
+                # Para avaliarmos as junções entre as células, queremos juntá-las somente caso tenhamos
                 # evidência estatística suficiente de que a distribuição dos objetos compreendidos pelas
                 # células avaliadas seja homogênea. Alternativamente, queremos que os objetos pertencentes
                 # a um mesmo cluster, sejam regularmente distribuídos.
@@ -231,11 +220,11 @@ DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.
                 
                 # Aplica o teste Clark-Evans | ?spatstat.core::clarkevans
                 # OBS: Não utiliza correção dos efeitos de borda.
-                flag_merge <- ifelse(clarkevans.test(aux_ppp_obj, correction="none", alternative="clustered", nsim=1000)$p.val > alpha, TRUE, FALSE)
+                flag_merge <- ifelse(clarkevans.test(aux_ppp_obj, correction="none", alternative="regular", nsim=1000)$p.val <= alpha, TRUE, FALSE)
                 #print(clarkevans.test(aux_ppp_obj, correction="none", alternative="clustered")$p.val)
                 
                 # Comentário:
-                # Para avliarmos as junções entre as células, queremos juntá-las somente caso tenhamos
+                # Para avaliarmos as junções entre as células, queremos juntá-las somente caso tenhamos
                 # evidência estatística suficiente de que a distribuição dos objetos compreendidos pelas
                 # células avaliadas seja homogênea. Alternativamente, queremos que os objetos pertencentes
                 # a um mesmo cluster, sejam regularmente distribuídos.
@@ -360,10 +349,20 @@ DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.
     # Rotina auxiliar que dado um vetor de clusters, calcula os Índices de Silhueta/Calinksi-Harabasz
     assess_cluster_quality <- function(data, this.cluster, clust.fobj) {
         
-        # this.cluster <- points_cluster_mapping
+        # this.cluster <- points_cluster_mapping[[1]]
 
         # Remove os objetos do tipo ruído
-        this.cluster <- this.cluster[this.cluster$Cluster != -1, c("Xcoord","Ycoord","Cluster")]
+        if(!is.integer(which(this.cluster$Cluster == -1, arr.ind = T))) {
+            to_remove <- which(this.cluster$Cluster == -1, arr.ind = T) 
+            data <- data[-to_remove,] # Também remove do conjunto de dados original (sem projeção EMD)
+            this.cluster <- this.cluster[-to_rmeove, c("Xcoord","Ycoord","Cluster")]
+            
+        } else {
+            this.cluster <- this.cluster[, c("Xcoord","Ycoord","Cluster")]            
+        }
+    
+        # Padronização das variáveis do conjunto de dados
+        std_dist_mat <- apply(data, 2, function(j) {(j-mean(j))/sd(j)}) %>% dist() %>% as.matrix()
         
         if(clust.fobj == 'silhouette') {
             
@@ -371,11 +370,10 @@ DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.
             if(uniqueN(this.cluster$Cluster) == 1) {
                 score <- 0
             } else {
-                score <- cluster::silhouette(this.cluster$Cluster, dmatrix=as.matrix(dist(this.cluster[,c("Xcoord","Ycoord")]))) %>% as.data.frame()
+                score <- cluster::silhouette(this.cluster$Cluster, dmatrix=std_dist_mat) %>% as.data.frame()
                 score <- mean(score$sil_width)
             }
         
-             
         } else {
             
             # Calcula o Índice de Calinksi-Harabasz
@@ -399,6 +397,9 @@ DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.
     # Mapeia os pontos as células da grade e estrutura de vizinhança, diferenciando a abordagem a depender do algoritmo de grade aplicado
     if(which.method == "BFESGA") {
         
+        # Seleciona o melhor indivíduo obtido via força bruta
+        elite.grids <- elite.grids[1,]
+        
         # Mapeia os objetos as células da grade, indexando as mesmas de forma sistemática
         grid_cell_mapping <- suppressMessages(get_cell_mapping(ppp.obj, which.method, elite.grids))
         
@@ -412,7 +413,7 @@ DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.
         points_cluster_mapping <- suppressMessages(left_join(grid_cell_mapping$points_cell_mapping, grid_cluster_mapping, on="Index"))
         
         # Avaliação dos clusters com base no índice de qualidade escolhido
-        cluster_score <- suppressMessages(assess_cluster_quality(points_cluster_mapping, clust.fobj))
+        cluster_score <- suppressMessages(assess_cluster_quality(data, points_cluster_mapping, clust.fobj))
         
         message('..... Finalizado DGBClust')
         
@@ -423,7 +424,7 @@ DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.
             "k" = ifelse(-1 %in% unique(points_cluster_mapping$Cluster), uniqueN(points_cluster_mapping$Cluster)-1, uniqueN(points_cluster_mapping$Cluster)),
             "dist" = table(points_cluster_mapping$Cluster),
             "grid" = elite.grids,
-            "grid.ics" = elite.grids.scores,
+            "grid.ics" = elite.grids.scores[1],
             "grid.method" = which.method,
             "spatial.ppp.obj" = ppp.obj
         ))
@@ -447,7 +448,7 @@ DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.
         }))
         
         # Avaliação dos clusters com base no índice de qualidade escolhido
-        cluster_scores <- sapply(points_cluster_mapping, function(i) assess_cluster_quality(i, clust.fobj))
+        cluster_scores <- sapply(points_cluster_mapping, function(i) assess_cluster_quality(data, i, clust.fobj))
         best_cluster <- which.max(cluster_scores)[1] # Independente do índice escolhido, queremos maximizar ambos. Em caso de empate, seleciona o primeiro.
         
         message('..... Finalizado DGBClust')
@@ -470,4 +471,33 @@ DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.
     }
     
 }
+
+############
+# Validações
+############
+# --> Debugging
+# data <- datasets[[2]]; ppp.obj <- esg_outputs[[2]]$ppp.obj; elite.grids <- esg_outputs[[2]]$all.indv
+# elite.grids.scores <- esg_outputs[[2]]$fit.scores; which.method <- esg_outputs[[2]]$grid.method
+# alpha=.05; density.test='hopkins'; clust.fobj="silhouette"
+
+# --> Validação
+# datasets <- all_cluster_data[c(1,3,14,24)]
+# 
+# esg_clust <- lapply(1:length(datasets), function(i) {
+#     DGBClust_main(datasets[[i]], esg_outputs[[i]]$ppp.obj, esg_outputs[[i]]$all.indv, esg_outputs[[i]]$fit.scores, esg_outputs[[i]]$grid.method)
+# })
+# 
+# lapply(1:length(esg_clust), function(i) {
+#     PlotMDS(cbind(esg_clust[[i]]$spatial.ppp.obj$x, esg_clust[[i]]$spatial.ppp.obj$y), esg_clust[[i]]$cluster,
+#             title = paste0("ISM: ", esg_clust[[i]]$score, "\n", "ICS: ", esg_clust[[i]]$grid.ics) )
+# })
+# 
+# asg_clust <- lapply(1:length(datasets), function(i) {
+#     DGBClust_main(datasets[[i]], asg_outputs[[i]]$ppp.obj, asg_outputs[[i]]$all.indv, asg_outputs[[i]]$fit.scores, asg_outputs[[i]]$grid.method)
+# })
+# 
+# lapply(1:length(asg_clust), function(i) {
+#     PlotMDS(cbind(asg_clust[[i]]$spatial.ppp.obj$x, asg_clust[[i]]$spatial.ppp.obj$y), asg_clust[[i]]$cluster,
+#             title = paste0("ISM: ", asg_clust[[i]]$score, "\n", "ICS: ", asg_clust[[i]]$best.grid.ics))
+# })
 
