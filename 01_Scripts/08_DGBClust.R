@@ -421,7 +421,7 @@ DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.
         return(list(
             "cluster" = points_cluster_mapping$Cluster,
             "score" = cluster_score,
-            "k" = ifelse(-1 %in% unique(points_cluster_mapping$Cluster), uniqueN(points_cluster_mapping$Cluster)-1, uniqueN(points_cluster_mapping$Cluster)),
+            "k" = uniqueN(points_cluster_mapping$Cluster),
             "dist" = table(points_cluster_mapping$Cluster),
             "grid" = elite.grids,
             "grid.ics" = elite.grids.scores[1],
@@ -457,9 +457,7 @@ DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.
         return(list(
             "cluster" = points_cluster_mapping[[best_cluster]]$Cluster,
             "score" = cluster_scores[best_cluster],
-            "k" = ifelse(-1 %in% unique(points_cluster_mapping[[best_cluster]]$Cluster),
-                         uniqueN(points_cluster_mapping[[best_cluster]]$Cluster)-1,
-                         uniqueN(points_cluster_mapping[[best_cluster]]$Cluster)),
+            "k" = uniqueN(points_cluster_mapping[[best_cluster]]$Cluster),
             "dist" = table(points_cluster_mapping[[best_cluster]]$Cluster),
             "best.grid" = elite.grids[[best_cluster]],
             "best.grid.ics" = elite.grids.scores[best_cluster],
@@ -501,3 +499,14 @@ DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.
 #             title = paste0("ISM: ", asg_clust[[i]]$score, "\n", "ICS: ", asg_clust[[i]]$best.grid.ics))
 # })
 
+# --> Investigação pontual (instância OUTLIERS)
+# dataset <- all_cluster_data[[19]]; ppp.obj <- esg_output$ppp.obj; elite.grids <- esg_output$all.indv
+# elite.grids.scores <- esg_output$fit.scores; which.method <- esg_output$grid.method; alpha=.05; density.test='clarkevans'; clust.fobj="silhouette"
+#
+# outliers_esg <- DGBClust_main(dataset, esg_output$ppp.obj, esg_output$all.indv, esg_output$fit.scores, esg_output$grid.method)
+# PlotMDS(cbind(outliers_esg$spatial.ppp.obj$x, outliers_esg$spatial.ppp.obj$y), outliers_esg$cluster,
+#     title = paste0("ISM: ", outliers_esg$score, "\n", "ICS: ", outliers_esg$grid.ics)) 
+#
+# outliers_asg <- DGBClust_main(dataset, asg_output$ppp.obj, asg_output$all.indv, asg_output$fit.scores, asg_output$grid.method)
+# PlotMDS(cbind(outliers_asg$spatial.ppp.obj$x, outliers_asg$spatial.ppp.obj$y), outliers_asg$cluster,
+#      title = paste0("ISM: ", outliers_asg$score, "\n", "ICS: ", outliers_asg$best.grid.ics)) 

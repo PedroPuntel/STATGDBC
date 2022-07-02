@@ -16,8 +16,11 @@ source("01_Scripts/08_DGBClust.R")
 ############
 # mds_projections <- lapply(c(1,3,14,24), function(i) MDSProjection(all_cluster_data[[i]]))
 
+# --> Investigação pontual (instância OUTLIERS)
+# mds_projections <- MDSProjection(all_cluster_data[[19]]) (outliers)
+
 # Rotina que implementa o algoritmo STATGDBC por completo
-STATGDBC <- function(data, alpha=.05, only.ics=0, grid.type="esg", density.test="clarkevans", clust.fobj="silhouette", p, iter) {
+STATGDBC <- function(data, alpha=.05, only.ics=0, grid.type="esg", density.test="clarkevans", clust.fobj="silhouette") {
     
     # --> Entradas:
     # . data <data.table | data.frame>: Conjunto de dados
@@ -67,9 +70,7 @@ STATGDBC <- function(data, alpha=.05, only.ics=0, grid.type="esg", density.test=
             grid.results <- ESG_main(
                 mds.proj = mds.proj,
                 alpha = alpha,
-                only.ics = only.ics,
-                iter = iter,
-                p = p                
+                only.ics = only.ics
             )
             
         } else {
@@ -78,9 +79,7 @@ STATGDBC <- function(data, alpha=.05, only.ics=0, grid.type="esg", density.test=
             grid.results <- ASG_main(
                 mds.proj = mds.proj,
                 alpha = alpha,
-                only.ics = only.ics,
-                iter = iter,
-                p = p
+                only.ics = only.ics
             )
             
         }

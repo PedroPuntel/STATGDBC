@@ -158,12 +158,23 @@ ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=300, tol=0.2, p=200, 
         # Contadores
         current.tol <- 0
         gen <- 1
+        flag_forced_ics_execution <- FALSE
         
         # Enquanto o critério de parada não for atingido
         while(gen <= iter && current.tol <= (tol*iter)) {
             
             # Aplica o decodificador
             fit.scores <- lapply(pop, function(i) decoder(i, grid.ppp, alpha, only.ics)) %>% unlist()
+            
+            # Safeguard
+            # . Apesar de ser raro, observou-se através da instância OUTLIERS, a possibilidade de
+            # nenhuma composição de grade atenda as restrições do teste chi-quadrado. Assim, por
+            # questões de compatibilidade com os demais procedimentos do algoritmo, nesta situação
+            # específica, será emitido um warning ao usuário e o ICS associado a grade será calculado
+            if( all(is.na(fit.scores)) ) {
+                flag_forced_ics_execution = TRUE
+                fit.scores <- lapply(pop, function(i) ComputeICS(grid.ppp, i, asymetrical = T)) %>% unlist() # Força o cálculo do ICS
+            }            
             
             # Ordena os indivíduos com base no seu score de ICS
             pop <- pop[order(fit.scores, decreasing = T)]
@@ -223,6 +234,10 @@ ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=300, tol=0.2, p=200, 
         # Remove entradas nulas da lista de indivíduos (caso existam)
         best.indv[sapply(best.indv, is.null)] <- NULL
         
+        # Safeguard - Warning
+        if(flag_forced_ics_execution == T)
+            message("WARNING: Nenhuma composicao de grade avaliada atendeu a restricao Chi-Quadrado. Executado considerando only.ics = 1...")
+        
         # Retorna os resultados
         return(list(
             "fit.best" = max(unique(fit.best[fit.best != 0])),
@@ -263,3 +278,8 @@ ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=300, tol=0.2, p=200, 
 ############
 # asg_outputs <- lapply(mds_projections, function(i) ASG_main(i, verbose=T)) # Approx. 2min
 # lapply(asg_outputs, function(i) PlotGrid(i$ppp.obj, i$best.indv[[1]], T))
+
+# --> Investigação pontual (instância OUTLIERS)
+# mds.proj <- mds_projections; alpha=.05; only.ics=0; iter=300; tol=0.2; p=200; pe=0.25; pm=0.3; rho=0.8; verbose=T
+# asg_output <- ASG_main(mds_projections, verbose=T)
+# PlotGrid(asg_output$ppp.obj, asg_output$best.indv[[1]], T)

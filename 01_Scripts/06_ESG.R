@@ -15,7 +15,7 @@ require("spatstat.geom")
 options(scipen = 999)
 
 # Rotina principal que implementa a abordagem proposta de ESG como um todo
-ESG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=100, pe=0.25, pm=0.3, rho=0.8, verbose=F) {
+ESG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=300, tol=0.2, p=500, pe=0.25, pm=0.3, rho=0.8, verbose=F) {
     
     # --> Entradas (fornecidas pelo usuário)
     # . mds.proj <matrix>: Projeção resultante da rotina MDSProjection()
@@ -152,12 +152,23 @@ ESG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=100, 
         # Contadores
         current.tol <- 0
         gen <- 1
+        flag_forced_ics_execution <- FALSE
         
         # Enquanto o critério de parada não for atingido
         while(gen <= iter && current.tol <= (tol*iter)) {
             
             # Aplica o decodificador
             fit.scores <- lapply(pop, function(i) decoder(i, grid.ppp, alpha, only.ics)) %>% unlist()
+            
+            # Safeguard
+            # . Apesar de ser raro, observou-se através da instância OUTLIERS, a possibilidade de
+            # nenhuma composição de grade atenda as restrições do teste chi-quadrado. Assim, por
+            # questões de compatibilidade com os demais procedimentos do algoritmo, nesta situação
+            # específica, será emitido um warning ao usuário e o ICS associado a grade será calculado
+            if( all(is.na(fit.scores)) ) {
+                flag_forced_ics_execution = TRUE
+                fit.scores <- lapply(pop, function(i) ComputeICS(grid.ppp, i)) %>% unlist() # Força o cálculo do ICS
+            } 
             
             # Ordena os indivíduos com base no seu score de ICS
             pop <- pop[order(fit.scores, decreasing = T)]
@@ -217,6 +228,10 @@ ESG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=100, 
         # Remove entradas nulas da lista de indivíduos (caso existam)
         best.indv[sapply(best.indv, is.null)] <- NULL
         
+        # Safeguard - Warning
+        if(flag_forced_ics_execution == T)
+            message("WARNING: Nenhuma composicao de grade avaliada atendeu a restricao Chi-Quadrado. Executado considerando only.ics = 1...")        
+        
         # Retorna os resultados
         return(list(
             "fit.best" = max(unique(fit.best[fit.best != 0])),
@@ -240,6 +255,16 @@ ESG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=100, 
         # Calcula os scores
         # . Por simplicidade, utiliza o mesmo decodificador do ESGBRKGA
         all_grids$scores <- apply(all_grids, 1, function(i) decoder(i, grid.ppp, alpha, only.ics))
+        
+        # Safeguard
+        # . Apesar de ser raro, observou-se através da instância OUTLIERS, a possibilidade de
+        # nenhuma composição de grade atenda as restrições do teste chi-quadrado. Assim, por
+        # questões de compatibilidade com os demais procedimentos do algoritmo, nesta situação
+        # específica, será emitido um warning ao usuário e o ICS associado a grade será calculado
+        if( all(is.na(all_grids$scores)) ) {
+            message("WARNING: Nenhuma composicao de grade avaliada atende a restricao Chi-Quadrado. Reexecutando considerando only.ics = 1...")
+            all_grids$scores <- apply(all_grids[,c(1:2)], 1, function(i) ComputeICS(grid.ppp, i)) # Força o cálculo do ICS
+        }
         
         # Ordena de forma decrescente
         all_grids <- all_grids %>% arrange(desc(scores)) # Problema de maximização
@@ -278,23 +303,23 @@ ESG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=100, 
     n_grids <- getMaxNumGrids(mds.proj, N_X, N_Y)
     
     # Decide qual abordagem utilizar
-    # if (n_grids >= 1000) {
-    #     
-    #     # if(verbose == T) message('Abordagem de Grade: ESGBRKGA')
-    #     message('Abordagem de Grade: ESGBRKGA')
-    #     out <- ESGBRKGA(mds.proj, N_X, N_Y, grid.ppp, alpha, only.ics, iter, tol, p, pe, pm, rho, verbose)
-    #     
-    # } else {
-    #     
-    #     # if(verbose == T) message('Abordagem de Grade: BFESGA')
-    #     message('Abordagem de Grade: BFESGA')
-    #     out <- BFESGA(mds.proj, N_X, N_Y, grid.ppp, alpha, only.ics)
-    #     
-    # }
+    if (n_grids >= 1000) {
+        
+        # if(verbose == T) message('Abordagem de Grade: ESGBRKGA')
+        message('Abordagem de Grade: ESGBRKGA')
+        out <- ESGBRKGA(mds.proj, N_X, N_Y, grid.ppp, alpha, only.ics, iter, tol, p, pe, pm, rho, verbose)
+        
+    } else {
+        
+        # if(verbose == T) message('Abordagem de Grade: BFESGA')
+        message('Abordagem de Grade: BFESGA')
+        out <- BFESGA(mds.proj, N_X, N_Y, grid.ppp, alpha, only.ics)
+        
+    }
     
     # Temporário: Força execução via ESGBRKGA
-    message('Abordagem de Grade: ESGBRKGA')
-    out <- ESGBRKGA(mds.proj, N_X, N_Y, grid.ppp, alpha, only.ics, iter, tol, p, pe, pm, rho, verbose)
+    # message('Abordagem de Grade: ESGBRKGA')
+    # out <- ESGBRKGA(mds.proj, N_X, N_Y, grid.ppp, alpha, only.ics, iter, tol, p, pe, pm, rho, verbose)
     
     # Retorna as informações
     return(out)
@@ -306,3 +331,8 @@ ESG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=200, tol=0.2, p=100, 
 ############
 # esg_outputs <- lapply(mds_projections, function(i) ESG_main(i, verbose=T)) # ~ Approx 1min
 # lapply(esg_outputs, function(i) PlotGrid(i$ppp.obj, i$best.indv, F))
+
+# --> Investigação pontual (instância OUTLIERS)
+# mds.proj <- mds_projections; alpha=.05; only.ics=0; iter=300; tol=0.2; p=500; pe=0.25; pm=0.3; rho=0.8; verbose=T
+# esg_output <- ESG_main(mds_projections, verbose=T)
+# PlotGrid(esg_output$ppp.obj, esg_output$best.indv, F)

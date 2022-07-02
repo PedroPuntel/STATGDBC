@@ -39,19 +39,11 @@ Encoding: UTF-8
 		------------------------------------------------ Capítulo 5 ------------------------------------------------
 		
 		- (OK) Seção 5.1 - Base de Dados
-	
-		- (Pendente) Seção 5.2 - Calibração de Parâmetros
-		    --> Subconjunto de teste   (x7)
-		    --> 5x replicações         (x5)
-		    --> Pop: 200 - 500 - 1000  (x3)
-		    --> Iter: 200 - 500 - 1000 (x3)
-		    --> grid.type: ESG - ASG   (x2) >> 630 exec
-		    >> Demais parâmetros, manter default
 		    
-		- (Refazer) Seção 5.2 - Estudo de Estabilidade
-			--> Tabela: Variabilidade em termos das Função Objetivo, Número de Grupos, Tempos de Execução e Algoritmo
+		- (OK) Seção 5.2 - Estudo de Estabilidade
 		
 		- (Pendente) Seção 5.3 - Estudo e Comparação entre os Parâmetros
+		
 		    . Seção 5.3.1 - Escalonamento Multidimensional
 			    --> Análise: Performance do EMD x Projeções Bidimensionais
 			
@@ -80,4 +72,8 @@ Encoding: UTF-8
 		        . Paralelização do algoritmo (disponibilidade Github),
 			    . Comparações com outros métodos
 			    . Diferentes critérios de mesclagem e/ou índices estatísticos
+			    
+	    (Pendente) Agradecimentos
+	    
+	    (Pendente) Abstract
 			    
