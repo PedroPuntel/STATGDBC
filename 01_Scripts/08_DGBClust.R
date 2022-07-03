@@ -193,7 +193,6 @@ DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.
                 m <- nrow(aux)-1 # Utiliza os |M|-1 pontos contidos na célula para compor a amostra da estatística de teste
                 hopkins_stat <- hopkins(X=aux, m=m)
                 flag_merge <- ifelse(hopkins.pval(hopkins_stat, n=m) > alpha, TRUE, FALSE)
-                #print(hopkins.pval(hopkins_stat, n=m))
                 
                 # Comentário:
                 # Para avaliarmos as junções entre as células, queremos juntá-las somente caso tenhamos
@@ -220,14 +219,20 @@ DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.
                 
                 # Aplica o teste Clark-Evans | ?spatstat.core::clarkevans
                 # OBS: Não utiliza correção dos efeitos de borda.
-                flag_merge <- ifelse(clarkevans.test(aux_ppp_obj, correction="none", alternative="regular", nsim=1000)$p.val <= alpha, TRUE, FALSE)
-                #print(clarkevans.test(aux_ppp_obj, correction="none", alternative="clustered")$p.val)
+                regular_pp_test <- ifelse(clarkevans.test(aux_ppp_obj, correction="none", alternative="regular", nsim=1000)$p.val <= alpha, TRUE, FALSE)
+                random_pp_test <- ifelse(clarkevans.test(aux_ppp_obj, correction="none", alternative="two.sided", nsim=1000)$p.val > alpha, TRUE, FALSE)
+                
+                if( isTRUE(regular_pp_test) || isTRUE(random_pp_test) ) {
+                    flag_merge <- TRUE
+                } else {
+                    flag_merge <- FALSE
+                }
                 
                 # Comentário:
                 # Para avaliarmos as junções entre as células, queremos juntá-las somente caso tenhamos
                 # evidência estatística suficiente de que a distribuição dos objetos compreendidos pelas
-                # células avaliadas seja homogênea. Alternativamente, queremos que os objetos pertencentes
-                # a um mesmo cluster, sejam regularmente distribuídos.
+                # células avaliadas seja homogênea/aleatória. Alternativamente, queremos que os objetos pertencentes
+                # a um mesmo cluster, sejam regularmente/aleatoriamente distribuídos.
             
             }
             

@@ -5,9 +5,8 @@ Encoding: UTF-8
 -----------
 . Deadlines
 -----------
-	--> 04/07: 
-		(STATGDBC) Implementação das correções + result ados brutos
-		(Monografia) Finalizar capítulo de estatística espacial
+    --> 07/07: Envio do formulaário de marcação de monografia + resumo
+    --> 18/07: Envio da monografia para leitura com todos os resultados
 
 -------
 . TO-DO
@@ -16,64 +15,70 @@ Encoding: UTF-8
 	-----------
 	. STATGDBC:
 	-----------
-		--> DBSCAN: Estudar como utilizá-lo e já calcular também os seus resultados para ir comparando
-	
+	     --> Until 18/07
+		    . Gráficos comparando EMD x coordenadas originais
+		    . Execução: Tabela com resultados ASG p/ instâncias de clusterização
+		    . Execução: Tabela com resultados ASG p/ instâncias de classificação
+		    . Analisar melhor composição de grade p/ utilizar na análise dos critéros estatísticos
+		    . Execução: Tabela com resultados x only.ics
+		    . Execução: Tabela com resultados x density.test
+		    . Execução: Tabela com resultados x clust.fobj
+		    . Analisar melhor combinção de parâmetros p/ utilizar na comparação com DBSCAN
+		    . DBSCAN: Estimação do parâmetro 'Epsilon' para as instâncias do conjunto de classificação
+		    . Execução: Tabela STATGDBC x DBSCAN (subconjunto de classificação)
+		    . Inspeção visual dos agrupamentos formados
+		
 	-------------
 	. Monografia:
 	-------------
-	
-		------------------------------------------------ Capítulo 3 ------------------------------------------------
-		--> Referência Estatístca Espacial: Livro Baddley
-		--> Não tem problema utilizar |M|-1 pontos no Teste de Hopkins
-		--> Teste de Clark-Evans unilateral
-		--> Mesclagem das células: Não queremos rejeitar a hipótese-nula de aleatoriedade espacial nos testes de Hopkins/Clark-Evans
-		--> Falar brevemente sobre efeitos de borda (não considerados) e distâncias evento-evento, ponto-evento e vizinho mais próximo
-		--> Descartar: Estacionariedade, Isotropia, PPP Não-Homogêneo, Monte-Carlo
-			
-		- (Pendente) Seção 3.3.2 - Processo de Poisson Homogêneo
-		
-		- (Pendente) Seção 3.3.3 - Investigação dos Efeitos de 1° Ordem
-		
-		- (Pendente) Seção 3.3.4 - Investigação dos Efeitos de 2° Ordem
-		
-		------------------------------------------------ Capítulo 5 ------------------------------------------------
-		
-		- (OK) Seção 5.1 - Base de Dados
-		    
-		- (OK) Seção 5.2 - Estudo de Estabilidade
-		
-		- (Pendente) Seção 5.3 - Estudo e Comparação entre os Parâmetros
-		
-		    . Seção 5.3.1 - Escalonamento Multidimensional
-			    --> Análise: Performance do EMD x Projeções Bidimensionais
-			
-			. Seção 5.3.2 - Composições de Grade
-    			--> Tabela: Resultados do algoritmo para as bases de clusterização e classificação (exceto Subconjunto de Teste)
-    			--> Análise: Qualidade das soluções e Número de Grupos x Composição de Grade (ESG/ASG)
-			
-			. Seção 5.3.3 - Critérios Estatísticos
-    			--> Análise: Qualidade das soluções e Número de Grupos x Utilizar ou Não Teste Quadrats (Etapa de Grade) p/ Subconjunto de Teste
-    			--> Análise: Qualidade das soluções e Número de Grupos x Testes Hopkins/Clark-Evans p/ Subconjunto de Teste
-			    --> Conclusão: Justificar escolha dos parâmetros (inclusive composição de grade) para comparação com o DBSCAN
-			
-		- (Pendente) Seção 5.4 - Comparação STATGDBC x DBSCAN
-		    --> Observação: Para o DBSCAN, utilizar dados originais (sem EMD) + parâmetros default (sem calibração)
-		    --> Tabela: Qualidade das Soluções, Número de Grupos (exceto ruído) e Tempos de Execução (Subconjunto de Classificação)
-		    --> Análise da tabela anterior
-		    --> Análise: Inspeção visual de alguns agrupamentos produzidos
-
-		------------------------------------------------ Capítulo 6 ------------------------------------------------			
-		
-		- Capítulo 6 - Conclusões
-		    --> Resumo da monografia
-		    --> Trabalhos futuros:
-		        . Testes/Medidas estatísticas diferentes e/ou Testes Estatísticos de Qualidade
-		        . Calibração de Parâmetros mais extensa (inclusive do DBSCAN)
-		        . Paralelização do algoritmo (disponibilidade Github),
-			    . Comparações com outros métodos
-			    . Diferentes critérios de mesclagem e/ou índices estatísticos
-			    
-	    (Pendente) Agradecimentos
+	    --> Until 18/07
+    	    . Adicionar nota de rodapé com repositório do Git
+    	    . 5.1 - Consertar tabela com bases de clusterização (remover instância 'MORESHAPES')
+    	    . 5.2 - Atualizar tabela com resultados de estabilidade
+    	    . 5.3.1 - Adicionar gráficos EMD x coordenadas originais
+    	    . 5.3.2 - Atualizar tabela com resultados para as instâncias de clusterização/classificação
+    	    . Finalizar seção 3.3.3
+    	    . Finalizar seção 3.3.4
+    	    . 5.2 - Descrever o breve estudo de simulação utilizado para calibração dos parâmetros
+    	    . 5.2 - Atualizar a análise dos resultados de estabilidade (se necessário)
+    	    . 5.3.1 - Análise das  projeções EMD x coordenadas originais
+    	    . 5.3.2 - Análisar qualidade das soluções (ISM, ICH, ICS) e Número de Grupos, por tipo de composição de Grade (ESG/ASG)
+    	    . 5.3.2 - Concluir seção justificando a escolha da melhor composição de grade
+    	    . 5.3.3 - Analisar critérios estatísticos, concluindo a seção com a escolha dos melhores critérios p/ comparação com DBSCAN
+    	    . 5.4 - Analisar resultados STATGDBC x DBSCAN
+	        . Escrever Abstract
+	        
+	   --> Backlog
+	        . Ajustes no texto (se existirem)
+	        . Escrever Agradecimentos
+	        . Adicionar folha de assinaturas
 	    
-	    (Pendente) Abstract
+---------------
+. General Notes
+---------------
+	    
+	------------------------------------------------ Capítulo 5 ------------------------------------------------
+	
+	- Seção 5.3.3 - Critérios Estatísticos
+		--> (Subconjunto de Teste) Analisar qualidade das soluções e Número de Grupos x Utilizar ou Não Teste Quadrats
+		--> (Subconjunto de Teste) Analisar qualidade das soluções e Número de Grupos x Testes Hopkins/Clark-Evans
+		--> (Subconjunto de Teste) Analisar qualidade das soluções e Número de Grupos x ISM e ICH
+	    --> Concluir justificando a escolha dos parâmetros (inclusive composição de grade) para comparação com o DBSCAN
+		
+	- Seção 5.4 - Comparação STATGDBC x DBSCAN
+	    --> Para o DBSCAN, utilizar dados originais (sem EMD) + parâmetros default (sem calibração)
+	    --> (Subconjunto de Classificação) Analisar qualidade das Soluções, Número de Grupos (exceto ruído) e Tempos de Execução
+	    --> Inspeção visual de alguns agrupamentos produzidos
+
+	------------------------------------------------ Capítulo 6 ------------------------------------------------			
+	
+	- Capítulo 6 - Conclusões
+	    --> Resumo da monografia
+	    --> Trabalhos futuros:
+	        . Testes/Medidas estatísticas diferentes e/ou Testes Estatísticos de Qualidade
+	        . Calibração de Parâmetros mais extensa (inclusive do DBSCAN)
+	        . Paralelização do algoritmo (disponibilidade Github),
+		    . Comparações com outros métodos
+		    . Diferentes critérios de mesclagem e/ou índices estatísticos
+    
 			    
