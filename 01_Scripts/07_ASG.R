@@ -12,7 +12,7 @@ require("dplyr")
 require("data.table")
 require("spatstat.core")
 require("spatstat.geom")
-options(scipen = 999)
+options(scipen = 999, digits = 10)
 
 # Rotina principal que implementa a abordagem proposta de ASG como um todo
 ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=300, tol=0.2, p=200, pe=0.25, pm=0.3, rho=0.8, verbose=F) {
@@ -54,7 +54,7 @@ ASG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=300, tol=0.2, p=200, 
         all_intervals_in_x <- seq(min_x + min_delta_x, max_x - min_delta_x, min_delta_x)
         all_intervals_in_y <- seq(min_y + min_delta_y, max_y - min_delta_y, min_delta_y)
         
-        # Determina o totald e intervalos possíveis (considerando a restrição [2;N_X],[2;N_Y])
+        # Determina o total de intervalos possíveis (considerando a restrição [2;N_X],[2;N_Y])
         n <- nrow(mds.proj); size_x <- length(all_intervals_in_x); size_y <- length(all_intervals_in_y)
         N_X <- ceiling(min(sqrt(n),size_x)); N_Y <- ceiling(min(sqrt(n),size_y))
         

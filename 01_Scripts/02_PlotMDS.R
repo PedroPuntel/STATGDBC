@@ -5,7 +5,7 @@
 require("ggplot2")
 
 # Rotina auxiliar que plota umna projeção obtida via EMD
-PlotMDS <- function(mds.proj, cluster.vec=NULL, title="") {
+PlotMDS <- function(mds.proj, cluster.vec=NULL, title="", col="#7e1e9c") {
     
     # --> Entradas:
     # . mds.proj <matrix> : Conjunto de dados resultante da projeção obtida via EMD
@@ -18,7 +18,7 @@ PlotMDS <- function(mds.proj, cluster.vec=NULL, title="") {
         
         # Gráfico
         mds.plot <- ggplot(as.data.frame(mds.proj), mapping=aes(x=V1, y=V2)) +
-            geom_point(color=sample(c("#029386","#f97306", "#7e1e9c", "#0343df"), 1), size=3) +
+            geom_point(color=col, size=3) +
             labs(x="\nX\n",  y="\nY\n", title=title) +
             theme_classic() +
             theme(plot.title = element_text(hjust = 0.5))

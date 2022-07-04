@@ -426,7 +426,7 @@ DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.
         return(list(
             "cluster" = points_cluster_mapping$Cluster,
             "score" = cluster_score,
-            "k" = uniqueN(points_cluster_mapping$Cluster),
+            "k" = ifelse(-1 %in% unique(points_cluster_mapping$Cluster), uniqueN(points_cluster_mapping$Cluster)-1, uniqueN(points_cluster_mapping$Cluster)),
             "dist" = table(points_cluster_mapping$Cluster),
             "grid" = elite.grids,
             "grid.ics" = elite.grids.scores[1],
@@ -462,7 +462,9 @@ DGBClust_main <- function(data, ppp.obj, elite.grids, elite.grids.scores, which.
         return(list(
             "cluster" = points_cluster_mapping[[best_cluster]]$Cluster,
             "score" = cluster_scores[best_cluster],
-            "k" = uniqueN(points_cluster_mapping[[best_cluster]]$Cluster),
+            "k" = ifelse(-1 %in% unique(points_cluster_mapping[[best_cluster]]$Cluster),
+                         uniqueN(points_cluster_mapping[[best_cluster]]$Cluster)-1,
+                         uniqueN(points_cluster_mapping[[best_cluster]]$Cluster)),
             "dist" = table(points_cluster_mapping[[best_cluster]]$Cluster),
             "best.grid" = elite.grids[[best_cluster]],
             "best.grid.ics" = elite.grids.scores[best_cluster],

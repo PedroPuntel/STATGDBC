@@ -148,18 +148,18 @@ test_subset_data <- list.files("00_Data/Processed/Subset/", full.names = T) %>% 
 # . Parâmetros p/ ASGBRKGA: p = 200 | iter = 300
 
 ############################################
-# 5.2 - Análise de Estabilidade do algoritmo
+# 5.2 - Análise de Estabilidade do algoritmo    
 ############################################
 # --> 10 replicações x 7 bases x 2 composições de grade
 # --> Objetivo: Avaliar estabilidade em termos das diferentes composições de grade
 
 # Simulações
-# sim_ESG <- lapply(test_subset_data, function(i) {
-#     replicate(10, STATGDBC(i, alpha=.05, only.ics=0, grid.type="esg", density.test="clarkevans", clust.fobj="silhouette"))
-# }); saveRDS(sim_ESG, '00_Data/Results/Stability_Assessment/ESG/sim_ESG_v2.rds') # Approx 15 mints
-# sim_ASG <- lapply(test_subset_data, function(i) {
-#     replicate(10, STATGDBC(i, alpha=.05, only.ics=0, grid.type="asg", density.test="clarkevans", clust.fobj="silhouette"))
-# }); saveRDS(sim_ASG, '00_Data/Results/Stability_Assessment/ASG/sim_ASG_v2.rds') # Approx 1.5hrs
+sim_ESG <- lapply(test_subset_data, function(i) {
+    replicate(10, STATGDBC(i, alpha=.05, only.ics=0, grid.type="esg", density.test="clarkevans", clust.fobj="silhouette"))
+}); saveRDS(sim_ESG, '00_Data/Results/Stability_Assessment/ESG/sim_ESG_v2.rds') # Approx 15 mints
+sim_ASG <- lapply(test_subset_data, function(i) {
+    replicate(10, STATGDBC(i, alpha=.05, only.ics=0, grid.type="asg", density.test="clarkevans", clust.fobj="silhouette"))
+}); saveRDS(sim_ASG, '00_Data/Results/Stability_Assessment/ASG/sim_ASG_v2.rds') # Approx 1.5hrs
 
 # Leitura dos resultados
 # sim_ESG <- readRDS('00_Data/Results/Stability_Assessment/ESG/sim_ESG_v2.rds')
@@ -175,69 +175,77 @@ test_subset_data <- list.files("00_Data/Processed/Subset/", full.names = T) %>% 
 # })
 
 # Tabela com resultados - Grade Reuglar (ESG)
-# ESG_min_k <- sapply(sim_ESG, function(i) min(apply(i, 2, function(j) j$k)) )
-# ESG_max_k <- sapply(sim_ESG, function(i) max(apply(i, 2, function(j) j$k)) )
-# ESG_med_k <- sapply(sim_ESG, function(i) mean(apply(i, 2, function(j) j$k)) ) %>% floor()
-# ESG_cv_k <- sapply(sim_ESG, function(i) sd(apply(i, 2, function(j) j$k))/mean(apply(i, 2, function(j) j$k)) )
-# ESG_min_is <-  sapply(sim_ESG, function(i) min(apply(i, 2, function(j) j$score)) )
-# ESG_max_is <-  sapply(sim_ESG, function(i) max(apply(i, 2, function(j) j$score)) )
-# ESG_med_is <-  sapply(sim_ESG, function(i) mean(apply(i, 2, function(j) j$score)) )
-# ESG_cv_is <- sapply(sim_ESG, function(i) sd(apply(i, 2, function(j) j$score))/mean(apply(i, 2, function(j) j$score)) )
-# ESG_min_exec <-  sapply(sim_ESG, function(i) min(apply(i, 2, function(j) j$exec)) )
-# ESG_max_exec <-  sapply(sim_ESG, function(i) max(apply(i, 2, function(j) j$exec)) )
-# ESG_med_exec <-  sapply(sim_ESG, function(i) mean(apply(i, 2, function(j) j$exec)) )
-# ESG_cv_exec <- sapply(sim_ESG, function(i) sd(apply(i, 2, function(j) j$exec))/mean(apply(i, 2, function(j) j$exec)) )
-# data.table(
-#     "Base" = test_datasets,
-#     "minK" = ESG_min_k,
-#     "medK" = ESG_med_k,
-#     "maxK" = ESG_max_k,
-#     "CVk" = ESG_cv_k,
-#     "minIS" = ESG_min_is,
-#     "medIS" = ESG_med_is,
-#     "maxIS" = ESG_max_is,
-#     "CVIS" = ESG_cv_is,
-#     "minEXEC" = ESG_min_exec,
-#     "medEXEC" = ESG_med_exec,
-#     "maxEXEC" = ESG_max_exec,
-#     "CVEXEC" = ESG_cv_exec
-# ) %>% fwrite('00_Data/Results/Stability_Assessment/ESG/ESG_Results_v2.csv', sep = ';')
+ESG_min_k <- sapply(sim_ESG, function(i) min(apply(i, 2, function(j) j$k)) )
+ESG_max_k <- sapply(sim_ESG, function(i) max(apply(i, 2, function(j) j$k)) )
+ESG_med_k <- sapply(sim_ESG, function(i) mean(apply(i, 2, function(j) j$k)) ) %>% floor()
+ESG_cv_k <- sapply(sim_ESG, function(i) sd(apply(i, 2, function(j) j$k))/mean(apply(i, 2, function(j) j$k)) )
+ESG_min_is <-  sapply(sim_ESG, function(i) min(apply(i, 2, function(j) j$score)) )
+ESG_max_is <-  sapply(sim_ESG, function(i) max(apply(i, 2, function(j) j$score)) )
+ESG_med_is <-  sapply(sim_ESG, function(i) mean(apply(i, 2, function(j) j$score)) )
+ESG_cv_is <- sapply(sim_ESG, function(i) sd(apply(i, 2, function(j) j$score))/mean(apply(i, 2, function(j) j$score)) )
+ESG_min_exec <-  sapply(sim_ESG, function(i) min(apply(i, 2, function(j) j$exec)) )
+ESG_max_exec <-  sapply(sim_ESG, function(i) max(apply(i, 2, function(j) j$exec)) )
+ESG_med_exec <-  sapply(sim_ESG, function(i) mean(apply(i, 2, function(j) j$exec)) )
+ESG_cv_exec <- sapply(sim_ESG, function(i) sd(apply(i, 2, function(j) j$exec))/mean(apply(i, 2, function(j) j$exec)) )
+data.table(
+    "Base" = test_datasets,
+    "minK" = ESG_min_k,
+    "medK" = ESG_med_k,
+    "maxK" = ESG_max_k,
+    "CVk" = ESG_cv_k,
+    "minIS" = ESG_min_is,
+    "medIS" = ESG_med_is,
+    "maxIS" = ESG_max_is,
+    "CVIS" = ESG_cv_is,
+    "minEXEC" = ESG_min_exec,
+    "medEXEC" = ESG_med_exec,
+    "maxEXEC" = ESG_max_exec,
+    "CVEXEC" = ESG_cv_exec
+) %>% fwrite('00_Data/Results/Stability_Assessment/ESG/ESG_Results_v2.csv', sep = ';')
 
 # Tabela com resultados - Grade Irregular (ASG)
-# ASG_min_k <- sapply(sim_ASG, function(i) min(apply(i, 2, function(j) j$k)) )
-# ASG_max_k <- sapply(sim_ASG, function(i) max(apply(i, 2, function(j) j$k)) )
-# ASG_med_k <- sapply(sim_ASG, function(i) mean(apply(i, 2, function(j) j$k)) ) %>% floor()
-# ASG_cv_k <- sapply(sim_ASG, function(i) sd(apply(i, 2, function(j) j$k))/mean(apply(i, 2, function(j) j$k)) )
-# ASG_min_is <-  sapply(sim_ASG, function(i) min(apply(i, 2, function(j) j$score)) )
-# ASG_max_is <-  sapply(sim_ASG, function(i) max(apply(i, 2, function(j) j$score)) )
-# ASG_med_is <-  sapply(sim_ASG, function(i) mean(apply(i, 2, function(j) j$score)) )
-# ASG_cv_is <- sapply(sim_ASG, function(i) sd(apply(i, 2, function(j) j$score))/mean(apply(i, 2, function(j) j$score)) )
-# ASG_min_exec <-  sapply(sim_ASG, function(i) min(apply(i, 2, function(j) j$exec)) )
-# ASG_max_exec <-  sapply(sim_ASG, function(i) max(apply(i, 2, function(j) j$exec)) )
-# ASG_med_exec <-  sapply(sim_ASG, function(i) mean(apply(i, 2, function(j) j$exec)) )
-# ASG_cv_exec <- sapply(sim_ASG, function(i) sd(apply(i, 2, function(j) j$exec))/mean(apply(i, 2, function(j) j$exec)) )
-# data.table(
-#     "Base" = test_datasets,
-#     "minK" =ASG_min_k,
-#     "medK" = ASG_med_k,
-#     "maxK" = ASG_max_k,
-#     "CVk" = ASG_cv_k,
-#     "minIS" = ASG_min_is,
-#     "medIS" = ASG_med_is,
-#     "maxIS" = ASG_max_is,
-#     "CVIS" = ASG_cv_is,
-#     "minEXEC" = ASG_min_exec,
-#     "medEXEC" = ASG_med_exec,
-#     "maxEXEC" = ASG_max_exec,
-#     "CVEXEC" = ASG_cv_exec
-# ) %>% fwrite('00_Data/Results/Stability_Assessment/ASG/ASG_Results_v2.csv', sep = ';')
+ASG_min_k <- sapply(sim_ASG, function(i) min(apply(i, 2, function(j) j$k)) )
+ASG_max_k <- sapply(sim_ASG, function(i) max(apply(i, 2, function(j) j$k)) )
+ASG_med_k <- sapply(sim_ASG, function(i) mean(apply(i, 2, function(j) j$k)) ) %>% floor()
+ASG_cv_k <- sapply(sim_ASG, function(i) sd(apply(i, 2, function(j) j$k))/mean(apply(i, 2, function(j) j$k)) )
+ASG_min_is <-  sapply(sim_ASG, function(i) min(apply(i, 2, function(j) j$score)) )
+ASG_max_is <-  sapply(sim_ASG, function(i) max(apply(i, 2, function(j) j$score)) )
+ASG_med_is <-  sapply(sim_ASG, function(i) mean(apply(i, 2, function(j) j$score)) )
+ASG_cv_is <- sapply(sim_ASG, function(i) sd(apply(i, 2, function(j) j$score))/mean(apply(i, 2, function(j) j$score)) )
+ASG_min_exec <-  sapply(sim_ASG, function(i) min(apply(i, 2, function(j) j$exec)) )
+ASG_max_exec <-  sapply(sim_ASG, function(i) max(apply(i, 2, function(j) j$exec)) )
+ASG_med_exec <-  sapply(sim_ASG, function(i) mean(apply(i, 2, function(j) j$exec)) )
+ASG_cv_exec <- sapply(sim_ASG, function(i) sd(apply(i, 2, function(j) j$exec))/mean(apply(i, 2, function(j) j$exec)) )
+data.table(
+    "Base" = test_datasets,
+    "minK" =ASG_min_k,
+    "medK" = ASG_med_k,
+    "maxK" = ASG_max_k,
+    "CVk" = ASG_cv_k,
+    "minIS" = ASG_min_is,
+    "medIS" = ASG_med_is,
+    "maxIS" = ASG_max_is,
+    "CVIS" = ASG_cv_is,
+    "minEXEC" = ASG_min_exec,
+    "medEXEC" = ASG_med_exec,
+    "maxEXEC" = ASG_max_exec,
+    "CVEXEC" = ASG_cv_exec
+) %>% fwrite('00_Data/Results/Stability_Assessment/ASG/ASG_Results_v2.csv', sep = ';')
 
 ########################################
 # 5.3.1 - Escalonamento Multidimensional
 ########################################
 # --> Comparação visual das projeções EMD x coordenadas originais de algumas as instâncias bidimensionais
+# --> Instâncias escolhidas: 200DATA, A1, GAUSS9, UNIFORM700
+# --> Cores: "#029386","#f97306", "#7e1e9c", "#0343df"
 
-
+# datasets <- list(all_cluster_data[[1]], all_cluster_data[[3]], test_subset_data[[5]], test_subset_data[[6]])
+# mds_projections <- lapply(datasets, function(i) MDSProjection(as.data.frame(i)))
+# 
+# PlotMDS(mds_projections[[1]], title="200DATA (Projeção EMD)", col="#f97306"); PlotMDS(datasets[1], title="200DATA (Original)", col="#f97306")
+# PlotMDS(mds_projections[[2]], title="A1 (Projeção EMD)",  col="#029386"); PlotMDS(datasets[2], title="A1 (Original)", col="#029386")
+# PlotMDS(mds_projections[[3]], title="GAUSS9 (Projeção EMD)"); PlotMDS(datasets[3], title="GAUSS9 (Original)")
+# PlotMDS(mds_projections[[4]], title="UNIFORM700 (Projeção EMD)", col="#0343df"); PlotMDS(datasets[4], title="UNIFORM700 (Original)", col="#0343df")
 
 #################################################
 # 5.3.2 - Estudo e Comparação entre os Parâmetros
@@ -305,9 +313,9 @@ classf_datasets <- c(
 )
 
 # Resultados - Bases de Clusterização + Grade Regular (ESG)
-# clust_ESG_results <- lapply(c(all_cluster_data, test_subset_data), function(i)
-#     STATGDBC(i, alpha=.05, only.ics=0, grid.type="esg", density.test="clarkevans", clust.fobj="silhouette")
-# ); saveRDS(clust_ESG_results, '00_Data/Results/Clustering/ESG/clust_ESG_v2.rds')
+clust_ESG_results <- lapply(c(all_cluster_data, test_subset_data), function(i)
+    STATGDBC(i, alpha=.05, only.ics=0, grid.type="esg", density.test="clarkevans", clust.fobj="silhouette")
+); saveRDS(clust_ESG_results, '00_Data/Results/Clustering/ESG/clust_ESG_v2.rds')
 # 
 # clust_ESG_results <- readRDS('00_Data/Results/Clustering/ESG/clust_ESG_v2.rds')
 # 
@@ -319,87 +327,87 @@ classf_datasets <- c(
 #     )
 # })
 # 
-# clust_esg_ics <- unlist(sapply(clust_ESG_results, function(i) if(is.null(i$grid.ics)) return(i$best.grid.ics) else return(i$grid.ics)))
-# clust_esg_algo <- unlist(sapply(clust_ESG_results, function(i) if(is.null(i$grid.method)) return(i$grids.method) else return(i$grid.method)))
-# clust_esg_k <- unlist(sapply(clust_ESG_results, function(i) i$k))
-# clust_esg_ism <- unlist(sapply(clust_ESG_results, function(i) i$score))
-# clust_esg_ich <- unlist(sapply(clust_ESG_results, function(i) get_ich(i)))
-# 
-# data.table(
-#     "Base" = c(clust_datasets, test_datasets),
-#     "Algo" = clust_esg_algo,
-#     "K" = clust_esg_k,
-#     "ISM" = clust_esg_ism,
-#     "ICH" = clust_esg_ich,
-#     "ICS" = clust_esg_ics
-# ) %>% fwrite('00_Data/Results/Clustering/ESG/ESG_Results_v2.csv', sep = ';')
+clust_esg_ics <- unlist(sapply(clust_ESG_results, function(i) if(is.null(i$grid.ics)) return(i$best.grid.ics) else return(i$grid.ics)))
+clust_esg_algo <- unlist(sapply(clust_ESG_results, function(i) if(is.null(i$grid.method)) return(i$grids.method) else return(i$grid.method)))
+clust_esg_k <- unlist(sapply(clust_ESG_results, function(i) i$k))
+clust_esg_ism <- unlist(sapply(clust_ESG_results, function(i) i$score))
+clust_esg_ich <- unlist(sapply(clust_ESG_results, function(i) get_ich(i)))
 
-# Resultados - Bases de Clusterização + Grade Irregular (ASG)
+data.table(
+    "Base" = c(clust_datasets, test_datasets),
+    "Algo" = clust_esg_algo,
+    "K" = clust_esg_k,
+    "ISM" = clust_esg_ism,
+    "ICH" = clust_esg_ich,
+    "ICS" = clust_esg_ics
+) %>% fwrite('00_Data/Results/Clustering/ESG/ESG_Results_v2.csv', sep = ';')
+
+# Resultados - Bases de Clusterização + Grade Irregular (ASG) - 15:49
 clust_ASG_results <- lapply(c(all_cluster_data, test_subset_data), function(i)
     STATGDBC(i, alpha=.05, only.ics=0, grid.type="asg", density.test="clarkevans", clust.fobj="silhouette")
 ); saveRDS(clust_ASG_results, '00_Data/Results/Clustering/ASG/clust_ASG_v2.rds')
-
-clust_ASG_results <- readRDS('00_Data/Results/Clustering/ASG/clust_ASG_v2.rds')
-
-clust_asg_ics <- sapply(clust_ASG_results, function(i) i$best.grid.ics)
-clust_asg_algo <- sapply(clust_ASG_results, function(i) i$grid.method)
-clust_asg_algo[sapply(clust_asg_algo, is.null)] <- 'ASGBRKGA'
+#
+# clust_ASG_results <- readRDS('00_Data/Results/Clustering/ASG/clust_ASG_v2.rds')
+#
+clust_asg_algo <- unlist(sapply(clust_ASG_results, function(i) i$grids.method))
+clust_asg_k <- unlist(sapply(clust_ASG_results, function(i) i$k))
+clust_asg_ism <- unlist(sapply(clust_ASG_results, function(i) i$score))
+clust_asg_ich <- unlist(sapply(clust_ASG_results, function(i) get_ich(i)))
+clust_asg_ics <- unlist(sapply(clust_ASG_results, function(i) i$best.grid.ics))
 
 data.table(
-    "Base" = datasets,
-    "Algo" = unlist(clust_asg_algo),
-    "K" = sapply(clust_ASG_results, function(i) i$k),
-    "IS" = sapply(clust_ASG_results, function(i) i$score),
-    "ICS" = unlist(clust_asg_ics)
+    "Base" = c(clust_datasets, test_datasets),
+    "Algo" = clust_asg_algo,
+    "K" = clust_asg_k,
+    "ISM" = clust_asg_ism,
+    "ICH" = clust_asg_ich,
+    "ICS" = clust_asg_ics
 ) %>% fwrite('00_Data/Results/Clustering/ASG/ASG_Results_v2.csv', sep = ';')
 
 # Resultados - Bases de Classificação + Grade Regular (ESG)
-# classf_ESG_results <- lapply(all_classf_data, function(i)
-#     STATGDBC(i, alpha=.05, only.ics=0, grid.type="esg", density.test="clarkevans", clust.fobj="silhouette")
-# ); saveRDS(classf_ESG_results, '00_Data/Results/Classification/ESG/classf_ESG_v2.rds')
+classf_ESG_results <- lapply(all_classf_data, function(i)
+    STATGDBC(i, alpha=.05, only.ics=0, grid.type="esg", density.test="clarkevans", clust.fobj="silhouette")
+); saveRDS(classf_ESG_results, '00_Data/Results/Classification/ESG/classf_ESG_v2.rds')
 # 
 # classf_ESG_results <- readRDS('00_Data/Results/Classification/ESG/classf_ESG_v2.rds')
 # 
-# lapply(classf_ESG_results, function(i) {PlotMDS(cbind(i$spatial.ppp.obj$x,i$spatial.ppp.obj$y), i$cluster)})
-# 
-# classf_esg_ics <- unlist(sapply(classf_ESG_results, function(i) if(is.null(i$grid.ics)) return(i$best.grid.ics) else return(i$grid.ics)))
-# classf_esg_algo <- unlist(sapply(classf_ESG_results, function(i) if(is.null(i$grid.method)) return(i$grids.method) else return(i$grid.method)))
-# classf_esg_k <- unlist(sapply(classf_ESG_results, function(i) i$k))
-# classf_esg_ism <- unlist(sapply(classf_ESG_results, function(i) i$score))
-# classf_esg_ich <- unlist(sapply(classf_ESG_results, function(i) get_ich(i)))
-# 
-# data.table(
-#     "Base" = classf_datasets,
-#     "Algo" = classf_esg_algo,
-#     "K" = classf_esg_k,
-#     "ISM" = classf_esg_ism,
-#     "ICH" = classf_esg_ich,
-#     "Rand" = sapply(1:18, function(i) get_adj_rand_index(classf_ESG_results[[i]], all_classf_clusters[[i]]$V1)),
-#     "ICS" = classf_esg_ics
-# ) %>% fwrite('00_Data/Results/Classification/ESG/ESG_Results_v2.csv', sep = ';')
-
-# Resultados - Bases de Classificação + Grade Irregular (ASG)
-classf_ASG_results <- lapply(all_classf_data, function(i)
-    STATGDBC(i, alpha=.05, only.ics=0, grid.type="asg", density.test="clarkevans", clust.fobj="silhouette")
-); saveRDS(classf_ASG_results, '00_Data/Results/Classification/ASG/classf_ASG_v2.rds')
-
-classf_ASG_results <- readRDS('00_Data/Results/Classification/ASG/classf_ASG_v2.rds')
-
-lapply(classf_ASG_results, function(i) {PlotMDS(cbind(i$spatial.ppp.obj$x,i$spatial.ppp.obj$y), i$cluster)})
-
-classf_asg_ics <- sapply(classf_ASG_results, function(i) i$best.grid.ics)
-classf_asg_ics[sapply(classf_asg_ics, is.null)] <- 0
-classf_asg_algo <- sapply(classf_ASG_results, function(i) i$grid.method)
-classf_asg_algo[sapply(classf_asg_algo, is.null)] <- 'ASGBRKGA'
+classf_esg_ics <- unlist(sapply(classf_ESG_results, function(i) if(is.null(i$grid.ics)) return(i$best.grid.ics) else return(i$grid.ics)))
+classf_esg_algo <- unlist(sapply(classf_ESG_results, function(i) if(is.null(i$grid.method)) return(i$grids.method) else return(i$grid.method)))
+classf_esg_k <- unlist(sapply(classf_ESG_results, function(i) i$k))
+classf_esg_ism <- unlist(sapply(classf_ESG_results, function(i) i$score))
+classf_esg_ich <- unlist(sapply(classf_ESG_results, function(i) get_ich(i)))
 
 data.table(
-    "Base" = datasets,
-    "Algo" = unlist(classf_asg_algo),
-    "K" = sapply(classf_ASG_results, function(i) i$k),
-    "IS" = sapply(classf_ASG_results, function(i) i$score),
-    "Rand" = sapply(1:length(classf_ASG_results), function(i) get_adj_rand_index(classf_ASG_results[[i]], all_classf_clusters[[i]])),
-    "ICS" = unlist(classf_asg_ics)
-) %>% fwrite('00_Data/Results/Classification/ASG/ASG_Results_v2.csv', sep = ';')
+    "Base" = classf_datasets,
+    "Algo" = classf_esg_algo,
+    "K" = classf_esg_k,
+    "ISM" = classf_esg_ism,
+    "ICH" = classf_esg_ich,
+    "Rand" = sapply(1:18, function(i) get_adj_rand_index(classf_ESG_results[[i]], all_classf_clusters[[i]]$V1)),
+    "ICS" = classf_esg_ics
+) %>% fwrite('00_Data/Results/Classification/ESG/ESG_Results_v2.csv', sep = ';')
+
+# Resultados - Bases de Classificação + Grade Irregular (ASG)
+# classf_ASG_results <- lapply(all_classf_data, function(i)
+#     STATGDBC(i, alpha=.05, only.ics=0, grid.type="asg", density.test="clarkevans", clust.fobj="silhouette")
+# ); saveRDS(classf_ASG_results, '00_Data/Results/Classification/ASG/classf_ASG_v2.rds')
+#
+# classf_ASG_results <- readRDS('00_Data/Results/Classification/ASG/classf_ASG_v2.rds')
+#
+# classf_asg_algo <- unlist(sapply(classf_ASG_results, function(i) i$grids.method))
+# classf_asg_k <- unlist(sapply(classf_ASG_results, function(i) i$k))
+# classf_asg_ism <- unlist(sapply(classf_ASG_results, function(i) i$score))
+# classf_asg_ich <- unlist(sapply(classf_ASG_results, function(i) get_ich(i)))
+# classf_asg_ics <- unlist(sapply(classf_ASG_results, function(i) i$best.grid.ics))
+#
+# data.table(
+#     "Base" = classf_datasets,
+#     "Algo" = classf_asg_algo,
+#     "K" = classf_asg_k,
+#     "ISM" = classf_asg_ism,
+#     "ICH" = classf_asg_ich,
+#     "ICS" = classf_asg_ics
+# ) %>% fwrite('00_Data/Results/Classification/ASG/ASG_Results_v2.csv', sep = ';')
 
 ################################
 # 5.3.3 - Critérios Estatísticos
@@ -410,7 +418,7 @@ data.table(
 #####################################
 
 # Pacote DBSCAN
-require("dbscan")
+# require("dbscan")
 
 
 
