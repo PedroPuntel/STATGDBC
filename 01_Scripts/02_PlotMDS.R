@@ -2,6 +2,7 @@
 # Encoding: UTF-8
 
 # Pacotes
+require('data.table')
 require("ggplot2")
 
 # Rotina auxiliar que plota umna projeção obtida via EMD
@@ -27,6 +28,19 @@ PlotMDS <- function(mds.proj, cluster.vec=NULL, title="", col="#7e1e9c") {
         
         df <- as.data.frame(cbind(mds.proj,cluster.vec))
         colnames(df) <- c('X','Y','Cluster')
+        
+        if( -1 %in% unique(df$Cluster) ) {
+            K <- uniqueN(df$Cluster)-1
+            clust_labels <- data.frame(Cluster = sort(unique(df$Cluster), F), Cluster_Fixed_Labels = c(-1,1:K))
+            df <- df %>% left_join(clust_labels, on = 'Cluster') %>% select(c('X','Y','Cluster_Fixed_Labels'))
+            colnames(df) <- c('X','Y','Cluster')
+        } else {
+            K <- uniqueN(df$Cluster)
+            clust_labels <- data.frame(Cluster = sort(unique(df$Cluster), F), Cluster_Fixed_Labels = 1:K)
+            df <- df %>% left_join(clust_labels, on = 'Cluster') %>% select(c('X','Y','Cluster_Fixed_Labels'))
+            colnames(df) <- c('X','Y','Cluster')            
+        }
+        
         df$Cluster <- as.character(df$Cluster)
         
         # Gráfico

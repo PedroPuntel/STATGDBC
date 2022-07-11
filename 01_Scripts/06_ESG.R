@@ -15,15 +15,15 @@ require("spatstat.geom")
 options(scipen = 999)
 
 # Rotina principal que implementa a abordagem proposta de ESG como um todo
-ESG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=300, tol=0.2, p=500, pe=0.25, pm=0.3, rho=0.8, verbose=F) {
+ESG_main <- function(mds.proj, alpha=.05, only.ics=0, iter=300, tol=0.2, p=200, pe=0.25, pm=0.3, rho=0.8, verbose=F) {
     
     # --> Entradas (fornecidas pelo usuário)
     # . mds.proj <matrix>: Projeção resultante da rotina MDSProjection()
     # . alpha <float>: Nível de significância para o Teste dos Quadrats. Default é 5%
     # . only.ics <int>: Se '1' (TRUE), avalia os grids somente com base no ICS. Se '0' (FALSE), com base no ICS e Teste dos Quadrats
-    # . iter <int>: Número de iterações do algoritmo. Default é 200 (definido com base em estudo de calibração de parâmetros)
+    # . iter <int>: Número de iterações do algoritmo. Default é 300 (definido com base em estudo de calibração de parâmetros)
     # . tol <int>: Proporção de gerações sem melhoria na função objetivo permitido. Default 20%
-    # . p <int>: Tamanho da poplução do algoritmo. Default é 100 (definido com base em estudo de calibração de parâmetros)
+    # . p <int>: Tamanho da poplução do algoritmo. Default é 200 (definido com base em estudo de calibração de parâmetros)
     # . pe <int>: Proporção de indivíduos que irão compor o conjunto elite. Default é 0.25
     # . pm <int>: Proporção de indivíduos mutantes. Default é 0.3
     # . rho <float>: Probabilidade de cruzamento dos indivíduos. Defaul é 0.8

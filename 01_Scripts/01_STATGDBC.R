@@ -2,9 +2,6 @@
 # Description: STATGDBC main script
 # Encoding: UTF-8
 
-# Notas de Desenvolvimento
-# --> TODO: Implementar lógica que permita ao usuário fornecer valores aos parâmetros do BRKGA
-
 # Imports
 source("01_Scripts/02_MDSProjection.R")
 source("01_Scripts/06_ESG.R")
@@ -17,7 +14,7 @@ source("01_Scripts/08_DGBClust.R")
 # mds_projections <- lapply(c(1,3,14,24), function(i) MDSProjection(all_cluster_data[[i]]))
 
 # --> Investigação pontual
-# mds_projections <- MDSProjection(all_classf_data[[3]])
+# mds_projections <- MDSProjection(clust_test_datasets[[5]])
 
 # Rotina que implementa o algoritmo STATGDBC por completo
 STATGDBC <- function(data, alpha=.05, only.ics=0, grid.type="esg", density.test="clarkevans", clust.fobj="silhouette") {
@@ -91,8 +88,8 @@ STATGDBC <- function(data, alpha=.05, only.ics=0, grid.type="esg", density.test=
         density.results <- DGBClust_main(
             data = as.data.frame(data),
             ppp.obj = grid.results$ppp.obj,
-            elite.grids = grid.results$best.indv,
-            elite.grids.scores = grid.results$fit.best,
+            elite.grids = grid.results$all.indv,
+            elite.grids.scores = grid.results$fit.scores,
             which.method = grid.results$grid.method,
             alpha = alpha,
             density.test = density.test,
