@@ -41,7 +41,10 @@ PlotMDS <- function(mds.proj, cluster.vec=NULL, title="", col="#7e1e9c") {
             colnames(df) <- c('X','Y','Cluster')            
         }
         
-        df$Cluster <- as.character(df$Cluster)
+        df$Cluster <- factor(df$Cluster, levels = sort(unique(df$Cluster)))
+        #f <- df %>% arrange(Cluster)
+        #df$Cluster <- as.character(df$Cluster)
+        #legend_order <- sort(unique((df$Cluster)))
         
         # Gráfico
         mds.plot <- ggplot(df, mapping=aes(x=X, y=Y, colour=Cluster)) +

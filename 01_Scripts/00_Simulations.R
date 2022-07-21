@@ -1053,126 +1053,137 @@ classf_results <- fread('00_Data/Results/Grid_Assessment/CLASSF_Final.csv') %>% 
 # ------------------------------------------------------------------------
 # Análise - Inspeção visual das soluções de agrupamento do DBSCAN/STATGDBC
 # ------------------------------------------------------------------------
-# dbscan_results <- readRDS('00_Data/Results/STATGDBC_DBSCAN_Comparison/DBSCAN_Results_V3.rds')
-# statgdbc_results <- readRDS('00_Data/Results/Statistical_Parameters_Analysis/STATGDBC_FINAL.rds')
-# 
-# all_datasets <- c(all_cluster_data, all_classf_data, test_subset_data)
-# all_names <- c(
-#     # Instâncias de Clusterização (25)
-#     "200DATA"
-#     ,"400P3C"
-#     ,"A1"
-#     ,"BANKNOTE"
-#     ,"BREASTB"
-#     ,"CHART"
-#     ,"CONCRETEDATA"
-#     ,"DBLCA"
-#     ,"DOWJONES"
-#     ,"FACE"
-#     ,"GAMMA400"
-#     ,"HAYES-ROTH"
-#     ,"INDIAN"
-#     ,"MARONNA"
-#     ,"NUMBERS2"
-#     ,"OUTLIERS"
-#     ,"PARKINSONS"
-#     ,"RUSPINI"
-#     ,"SONAR"
-#     ,"SPHERICAL4D3C"
-#     ,"SPRDESP"
-#     ,"SYNTHETICCONTROL"
-#     ,"TRIPADVISOR"
-#     ,"UNIFORM400"
-#     ,"WAVEFORM21"
-#     # Instâncias de Classificação (18)
-#     ,"AGGREGATION"
-#     ,"COMPOUND"
-#     ,"GLASS"
-#     ,"ECOLI"
-#     ,"FLAME"
-#     ,"HABERMAN"
-#     ,"IONOSPHERE"
-#     ,"IRIS"
-#     ,"JAIN"
-#     ,"NEW-THYROID"
-#     ,"PATHBASED"
-#     ,"PIMA.INDIANS"
-#     ,"R15"
-#     ,"SEEDS"
-#     ,"SPIRAL"
-#     ,"WDBC"
-#     ,"WINE"
-#     ,"YEAST"
-#     # Instâncias de Teste (7)
-#     ,"2-FACE"
-#     ,"BROKEN-RING"
-#     ,"BUPA"
-#     ,"FORESTFIRES"
-#     ,"GAUSS9"
-#     ,"UNIFORM700"
-#     ,"VOWEL2"
-# )
-#
+dbscan_results <- readRDS('00_Data/Results/STATGDBC_DBSCAN_Comparison/DBSCAN_Results_V3.rds')
+statgdbc_results <- readRDS('00_Data/Results/Statistical_Parameters_Analysis/STATGDBC_FINAL.rds')
+
+all_datasets <- c(all_cluster_data, all_classf_data, test_subset_data)
+all_names <- c(
+    # Instâncias de Clusterização (25)
+    "200DATA"
+    ,"400P3C"
+    ,"A1"
+    ,"BANKNOTE"
+    ,"BREASTB"
+    ,"CHART"
+    ,"CONCRETEDATA"
+    ,"DBLCA"
+    ,"DOWJONES"
+    ,"FACE"
+    ,"GAMMA400"
+    ,"HAYES-ROTH"
+    ,"INDIAN"
+    ,"MARONNA"
+    ,"NUMBERS2"
+    ,"OUTLIERS"
+    ,"PARKINSONS"
+    ,"RUSPINI"
+    ,"SONAR"
+    ,"SPHERICAL4D3C"
+    ,"SPRDESP"
+    ,"SYNTHETICCONTROL"
+    ,"TRIPADVISOR"
+    ,"UNIFORM400"
+    ,"WAVEFORM21"
+    # Instâncias de Classificação (18)
+    ,"AGGREGATION"
+    ,"COMPOUND"
+    ,"GLASS"
+    ,"ECOLI"
+    ,"FLAME"
+    ,"HABERMAN"
+    ,"IONOSPHERE"
+    ,"IRIS"
+    ,"JAIN"
+    ,"NEW-THYROID"
+    ,"PATHBASED"
+    ,"PIMA.INDIANS"
+    ,"R15"
+    ,"SEEDS"
+    ,"SPIRAL"
+    ,"WDBC"
+    ,"WINE"
+    ,"YEAST"
+    # Instâncias de Teste (7)
+    ,"2-FACE"
+    ,"BROKEN-RING"
+    ,"BUPA"
+    ,"FORESTFIRES"
+    ,"GAUSS9"
+    ,"UNIFORM700"
+    ,"VOWEL2"
+)
+
 # -------------------------------
 # STATGDBC - Todos os resultados:
 # -------------------------------
-# lapply(1:50, function(i) {
-#     PlotMDS(
-#         cbind(statgdbc_results[[i]]$spatial.ppp.obj$x, statgdbc_results[[i]]$spatial.ppp.obj$y),
-#         statgdbc_results[[i]]$cluster,
-#         title = paste0("STATGDBC\n ISM: ", statgdbc_results[[i]]$score, "\nInstância: ", all_names[i])
-#     )
-# })
-#
+lapply(1:50, function(i) {
+    PlotMDS(
+        cbind(statgdbc_results[[i]]$spatial.ppp.obj$x, statgdbc_results[[i]]$spatial.ppp.obj$y),
+        statgdbc_results[[i]]$cluster,
+        title = paste0("STATGDBC\n ISM: ", statgdbc_results[[i]]$score, "\nInstância: ", all_names[i])
+    )
+})
+
 # -----------------------------
 # DBSCAN - Todos os resultados:
 # ----------------------------
-# lapply(1:50, function(i) {
-#     PlotMDS(
-#         cbind(statgdbc_results[[i]]$spatial.ppp.obj$x, statgdbc_results[[i]]$spatial.ppp.obj$y),
-#         dbscan_results[[i]]$cluster,
-#         title = paste0("DBSCAN\n ISM: ", dbscan_results[[i]]$score, "\nInstância: ", all_names[i])
-#     )
-# })
-#
+lapply(1:50, function(i) {
+    PlotMDS(
+        cbind(statgdbc_results[[i]]$spatial.ppp.obj$x, statgdbc_results[[i]]$spatial.ppp.obj$y),
+        dbscan_results[[i]]$cluster,
+        title = paste0("DBSCAN\n ISM: ", dbscan_results[[i]]$score, "\nInstância: ", all_names[i])
+    )
+})
+
 # -------------------------------------------
 # Detalhamento - Instâncias de classificação:
 # -------------------------------------------
-# --> AGGREGATION (0.36 x 0.88), FLAME (0.01 x 0.45), HABERMAN (0.62 x 0.10), YEAST (0.54 x 0.06)
-#
-# -------------------------------------------
-# Detalhamento - Instâncias de clusterização:
-# -------------------------------------------
-# --> 200DATA. RUSPINI
-    
-PlotMDS(MDSProjection(all_datasets[[1]]), dbscan_results[[1]]$cluster, title="DBSCAN - Instância 200DATA")
-PlotMDS(MDSProjection(all_datasets[[1]]), statgdbc_results[[1]]$cluster,
-        title="STATGDBC\n Instância: 200DATA\n")
 
-PlotMDS(MDSProjection(all_datasets[[36]]), dbscan_results[[36]]$cluster, title="DBSCAN - Instância RUSPINI")
-PlotMDS(MDSProjection(all_datasets[[36]]), statgdbc_results[[36]]$cluster, title="STATGDBC - Instância RUSPINI")
+# AGGREGATION
+PlotMDS(
+    cbind(statgdbc_results[[26]]$spatial.ppp.obj$x, statgdbc_results[[26]]$spatial.ppp.obj$y),
+    statgdbc_results[[26]]$cluster,
+    title = paste0("STATGDBC\n Índice de Rand Ajustado: ", "\nInstância: ", all_names[26])
+)
+PlotMDS(
+    cbind(statgdbc_results[[26]]$spatial.ppp.obj$x, statgdbc_results[[26]]$spatial.ppp.obj$y),
+    dbscan_results[[26]]$cluster,
+    title = paste0("DBSCAN\n Índice de Rand Ajustado: ", "\nInstância: ", all_names[26])
+)
 
+# FLAME
+PlotMDS(
+    cbind(statgdbc_results[[30]]$spatial.ppp.obj$x, statgdbc_results[[30]]$spatial.ppp.obj$y),
+    statgdbc_results[[30]]$cluster,
+    title = paste0("STATGDBC\n Índice de Rand Ajustado: ", "\nInstância: ", all_names[30])
+)
+PlotMDS(
+    cbind(statgdbc_results[[30]]$spatial.ppp.obj$x, statgdbc_results[[30]]$spatial.ppp.obj$y),
+    dbscan_results[[30]]$cluster,
+    title = paste0("DBSCAN\n Índice de Rand Ajustado: ", "\nInstância: ", all_names[30])
+)
 
+# HABERMAN
+PlotMDS(
+    cbind(statgdbc_results[[31]]$spatial.ppp.obj$x, statgdbc_results[[31]]$spatial.ppp.obj$y),
+    statgdbc_results[[31]]$cluster,
+    title = paste0("STATGDBC\n Índice de Rand Ajustado: ", "\nInstância: ", all_names[31])
+)
+PlotMDS(
+    cbind(statgdbc_results[[31]]$spatial.ppp.obj$x, statgdbc_results[[31]]$spatial.ppp.obj$y),
+    dbscan_results[[31]]$cluster,
+    title = paste0("DBSCAN\n Índice de Rand Ajustado: ", "\nInstância: ", all_names[31])
+)
 
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# YEAST
+PlotMDS(
+    cbind(statgdbc_results[[43]]$spatial.ppp.obj$x, statgdbc_results[[43]]$spatial.ppp.obj$y),
+    statgdbc_results[[43]]$cluster,
+    title = paste0("STATGDBC\n Índice de Rand Ajustado: ", "\nInstância: ", all_names[43])
+)
+PlotMDS(
+    cbind(statgdbc_results[[43]]$spatial.ppp.obj$x, statgdbc_results[[43]]$spatial.ppp.obj$y),
+    dbscan_results[[43]]$cluster,
+    title = paste0("DBSCAN\n Índice de Rand Ajustado: ", "\nInstância: ", all_names[43])
+)
 

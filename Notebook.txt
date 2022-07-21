@@ -9,21 +9,6 @@ Deadlines
 _____________________
 Backlog de Atividades
 ---------------------
-    --> 3.3.3 - Investigação dos Efeitos de 1° Ordem
-        . Escrever
-    
-    --> 3.3.4 - Investigação dos Efeitos de 2° Ordem
-        . Escrever
-    
-    --> 5.3 - Estudo das Composições de Grade
-        . Escrever
-        
-    --> 5.4 - Critérios Estatísticos e Índices de Validação
-        . Escrever
-        
-    --> 5.5 - Comparações entre o STATGDBC e DBSCAN
-        . Reestimação do parâmetro epsilon para as instâncias (resultados muitos ruins no DBSCAN)
-        . Análise gráfica entre alguns dos agrupamentos produzidos pelo DBSCAN e STATGDBC (Top/Bottom 4 de cada algoritmo)
         
     --> 6 - Conclusões
 	    . Resumo da monografia
